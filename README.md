@@ -27,8 +27,8 @@ Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite*
 ## ⚡ Key Innovations & Features
 
 ### 1. 🎛️ Dual-Mode Cockpit (Basic vs. Advanced)
-* **⚡ Modo Básico (Daily Driving & Gaming):** Clean, non-distracting visual hierarchy displaying primary CPU/GPU temperatures, clocks, fan speed/PWM, VRM power draws, GDDR6 hotspot, and overall board thermals.
-* **🔬 Modo Avançado (Hardware Analytics & Overclocking):** Real-time SVG laser charts (temperature vs. clock curves with 30s/1m/2m windows), per-rail telemetry (Vin, Vout, DrMOS currents, VRM MOSFET phase temperatures), SMU overclock targets, and full individual 8-channel GDDR6 chip thermals.
+* **⚡ Basic Mode (Daily Driving & Gaming):** Clean, non-distracting visual hierarchy displaying primary CPU/GPU temperatures, clocks, fan speed/PWM, VRM power draws, GDDR6 hotspot, and overall board thermals.
+* **🔬 Advanced Mode (Hardware Analytics & Overclocking):** Real-time SVG laser charts (temperature vs. clock curves with 30s/1m/2m windows), per-rail telemetry (Vin, Vout, DrMOS currents, VRM MOSFET phase temperatures), SMU overclock targets, and full individual 8-channel GDDR6 chip thermals.
 * **💾 State Persistence:** Selected cockpit mode is stored locally in the browser (`localStorage`), remembering your preferred view across reboots and devices.
 
 ### 2. 📱 Native PWA Standalone Mobile App
