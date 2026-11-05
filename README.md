@@ -18,9 +18,9 @@ Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite*
 | :---: | :---: |
 | ![Desktop Basic Mode](images/dashboard-basic.png) | ![Desktop Advanced Mode](images/dashboard-advanced.png) |
 
-| Mobile Cockpit (PWA Standalone App) | Official App Icon (Oberon Silicon Die) |
-| :---: | :---: |
-| <img src="images/mobile-cockpit.png" width="340" alt="Mobile Cockpit PWA" /> | <img src="images/app-icon.png" width="180" alt="App Icon" /> |
+| Mobile: Basic View (Daily Drive) | Mobile: Advanced View (Telemetry) | Official App Icon (Oberon Die) |
+| :---: | :---: | :---: |
+| <img src="images/mobile-basic.png" width="270" alt="Mobile Basic Mode" /> | <img src="images/mobile-advanced.png" width="180" alt="Mobile Advanced Mode" /> | <img src="images/app-icon.png" width="160" alt="Official App Icon" /> |
 
 ---
 
