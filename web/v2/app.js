@@ -164,7 +164,20 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (_) {}
     setMicrofitState(savedMicrofit);
     if (microfitToggle) {
+        // Suppress mobile virtual focus box and clear active touch focus
+        const clearFocus = () => { try { microfitToggle.blur(); } catch (_) {} };
+        microfitToggle.addEventListener('pointerdown', clearFocus);
+        microfitToggle.addEventListener('pointerup', clearFocus);
+        microfitToggle.addEventListener('touchstart', clearFocus, { passive: true });
+        microfitToggle.addEventListener('touchend', clearFocus, { passive: true });
+        microfitToggle.addEventListener('focus', () => {
+            if (window.matchMedia('(pointer: coarse)').matches) {
+                clearFocus();
+            }
+        });
+
         microfitToggle.addEventListener('click', () => {
+            clearFocus();
             const active = microfitToggle.classList.contains('active') || microfitToggle.classList.contains('is-active');
             setMicrofitState(!active);
         });

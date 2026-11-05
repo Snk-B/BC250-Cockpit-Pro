@@ -1,12 +1,12 @@
 // AMD BC-250 Titanium Studio Service Worker
-const CACHE_NAME = 'bc250-v2-cache-v1';
+const CACHE_NAME = 'bc250-v2-cache-v3';
 const STATIC_ASSETS = [
   '/v2/',
   '/v2/index.html',
-  '/v2/style.css',
+  '/v2/style.css?v=2.3',
   '/v2/bc250-board.css',
   '/v2/memory.js',
-  '/v2/app.js',
+  '/v2/app.js?v=2.3',
   '/v2/manifest.json',
   '/v2/favicon.ico',
   '/v2/favicon-32x32.png',
