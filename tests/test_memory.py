@@ -216,6 +216,9 @@ class PatcherTests(unittest.TestCase):
     HOOK_REGS = (patcher.PACKED_HANDLER_REG, patcher.REGDUMP_HANDLER_REG, patcher.HANDLER_REG)
 
     def test_pinned_bin_and_symbols_agree(self):
+        symbols_path = ROOT / 'memory/payload/SMUPayload.symbols'
+        if not symbols_path.exists():
+            self.skipTest("SMUPayload.symbols not present in distribution repository")
         payload = patcher.load_payload()
         self.assertEqual(len(payload), patcher.PAYLOAD_SIZE + patcher.BSS_SIZE)
         self.assertEqual(payload[patcher.PAYLOAD_SIZE:], bytes(patcher.BSS_SIZE))
