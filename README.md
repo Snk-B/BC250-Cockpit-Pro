@@ -140,6 +140,47 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 
 ---
 
+---
+
+## ⚙️ Prerequisites & Kernel Drivers
+
+For **Cockpit Pro** to capture all hardware sensors (VRM power draw, voltages, fan tachometer/PWM, and individual GDDR6 memory chip temperatures), your Linux system needs the appropriate kernel modules:
+
+### 1. Recommended Operating System
+* **CachyOS (Recommended):** The official CachyOS BC-250 kernel (`linux-cachyos-bore-bc250` or `linux-cachyos`) includes native Oberon APU support and pre-packaged sensor drivers out of the box.
+* **Bazzite / SteamOS / Arch / Ubuntu:** Fully supported, provided the required DKMS modules below are loaded.
+
+### 2. Essential Kernel Modules
+* **`nct6687` (Super I/O Controller):**
+  * **Telemetry:** Blower fan RPM, dynamic fan PWM duty cycle control, motherboard temperature, VRM MOS temperature diode, and 12V PCIe voltage rail.
+  * **Loading:** Usually autoloaded by the kernel. You can manually load it with:
+    ```bash
+    sudo modprobe nct6687
+    ```
+
+* **`bc250_vrm` (PMBus / VRM Controller):**
+  * **Telemetry:** CPU & GPU core voltages (`Vout`), supply voltage (`Vin`), DrMOS current (`Iout`), active power draw (`Pout`), and VRM MOSFET phase temperatures.
+  * **Zero Hardware Mod Required:** Version `1.1.0` or newer reads the Intersil PMBus controller directly over the NCT6687 SMBus path with **no soldering or jumper wires required**!
+  * **Source:** [Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms) (or pre-installed in CachyOS BC-250).
+  * *(Legacy Note: If `bc250_vrm` is not used, the daemon can fall back to direct I2C PMBus reading, which requires the physical jumper wire mod between `I2C_HEADER1` and `TPMS1` detailed in [hardware.md](hardware.md)).*
+
+* **`bc250_memory` (GDDR6 VRAM Telemetry):**
+  * **Telemetry:** Individual temperatures for all 8 GDDR6 memory chips and memory hotspot tracking.
+  * **Source:** [Hexxeh/bc250-memory-dkms](https://github.com/Hexxeh/bc250-memory-dkms) (or pre-installed in CachyOS BC-250).
+
+### 3. Verification Commands
+Before launching the installer, you can verify that your sensors are active:
+
+```bash
+# Check if kernel sensor modules are loaded:
+lsmod | grep -E "nct6687|bc250"
+
+# Check available hardware monitoring sensors:
+sensors
+```
+
+If `sensors` outputs readings from `nct6687`, `bc250_vrm`, or `bc250_memory`, your hardware is 100% ready! The automated installer (`sudo ./install.sh`) will automatically detect your configuration and set up all services.
+
 ## 🚀 Quick Start & Installation
 
 ### Option A: Automated One-Line Installation (Recommended)
