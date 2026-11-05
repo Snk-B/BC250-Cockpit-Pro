@@ -1,12 +1,12 @@
 // AMD BC-250 Cockpit Pro Service Worker
-const CACHE_NAME = 'bc250-cache-v4';
+const CACHE_NAME = 'bc250-cache-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/style.css?v=2.4',
+  '/style.css?v=2.5',
   '/bc250-board.css?v=2.4',
   '/memory.js?v=2.4',
-  '/app.js?v=2.4',
+  '/app.js?v=2.5',
   '/manifest.json',
   '/favicon.ico',
   '/favicon-32x32.png',
