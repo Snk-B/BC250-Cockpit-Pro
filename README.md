@@ -40,7 +40,7 @@ Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite*
 * **Interactive SVG Vector Illustration:** Accurately models the physical AMD BC-250 PCB.
 * **PWM-Driven Cooling Turbine:** The central blower fan animates in real time, synchronizing its rotation speed dynamically with the actual NCT6687D fan RPM and PWM percentage.
 * **Thermal Heat-Glow Gradients:** The APU die and individual GDDR6 ICs dynamically transition from cool cyan to amber and saturated crimson as junction temperatures increase.
-* **Live Power Inflow Animation:** Visual electron flow tracks along the 12V PCIe power rail, 12V Micro-Fit connector, and VRM phases.
+* **Live Power Inflow Animation:** Visual electron flow tracks along the 12V PCIe power rail, dual 12V Micro-Fit connectors, and VRM phases.
 
 ### 4. 🧠 8-Channel GDDR6 VRAM Telemetry
 * **Individual Chip Readouts:** Direct telemetry for all 8 GDDR6 physical memory chips (`#0` through `#7`) via SMU queue 3 mailbox interrogation.
@@ -131,11 +131,11 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 | Specification | Details |
 | :--- | :--- |
 | **APU Codename** | Sony Oberon / AMD Cyan Skillfish (`gfx1013`, PCI `1002:13fe`) |
-| **CPU Architecture** | 8 Cores / 16 Threads AMD Zen 2 (up to 3.5 GHz) |
-| **GPU Architecture** | 40 Compute Units (CUs) / 2560 Shaders AMD RDNA 2 |
+| **CPU Architecture** | **6 Cores / 12 Threads** (Factory Stock) · Unlockable up to **8 Cores / 16 Threads** AMD Zen 2 (up to 3.5 GHz, silicon lottery dependent) |
+| **GPU Architecture** | **24 Compute Units / 1536 Shaders** (Factory Stock) · Unlockable up to **36, 38, or 40 CUs (up to 2560 Shaders)** AMD RDNA 2 (silicon lottery dependent) |
 | **Memory System** | 16 GB GDDR6 unified across a 256-bit bus (8 physical chips) |
-| **Super I/O Controller** | Nuvoton NCT6687D (manages fan PWM, tachometer, thermal diodes) |
-| **Power Inputs** | Dual 12V Rails (Standard 12V PCIe 8-pin + 12V Micro-Fit connector) |
+| **Super I/O Controller** | Nuvoton NCT6687D (manages fan PWM, tachometer, thermal diodes, and voltage sensing) |
+| **Power Inputs** | **Triple 12V Power Inputs** (1x Standard PCIe 8-pin + 2x Auxiliary Molex Micro-Fit 3.0 connectors for high-current overclock stability) |
 | **Supported OS** | CachyOS (`linux-cachyos-bore-bc250`), Bazzite, SteamOS |
 
 ---
