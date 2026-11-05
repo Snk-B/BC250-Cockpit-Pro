@@ -1,4 +1,4 @@
-// AMD BC-250 Titanium Studio Service Worker
+// AMD BC-250 Cockpit Pro Service Worker
 const CACHE_NAME = 'bc250-cache-v4';
 const STATIC_ASSETS = [
   '/',

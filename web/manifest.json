@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "AMD BC-250 Telemetry",
-  "short_name": "BC-250",
-  "description": "Industrial Real-Time Telemetry Cockpit for AMD BC-250",
+  "name": "AMD BC-250 Cockpit Pro",
+  "short_name": "Cockpit Pro",
+  "description": "Industrial Real-Time Telemetry Cockpit Pro for AMD BC-250 Oberon APU",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
