@@ -136,7 +136,7 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 | **Memory System** | 16 GB GDDR6 unified across a 256-bit bus (8 physical chips) |
 | **Super I/O Controller** | Nuvoton NCT6687D (manages fan PWM, tachometer, thermal diodes, and voltage sensing) |
 | **Power Inputs** | **Triple 12V Power Inputs** (1x Standard PCIe 8-pin + 2x Auxiliary Molex Micro-Fit 3.0 connectors for high-current overclock stability) |
-| **Supported OS** | CachyOS (`linux-cachyos-bore-bc250`), Bazzite, SteamOS |
+| **Supported OS** | CachyOS (all MastaG BC-250 kernels: standard, BORE, sched-ext), Bazzite, SteamOS, Arch Linux |
 
 ---
 
@@ -146,11 +146,12 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 
 For **Cockpit Pro** to capture all hardware sensors (VRM power draw, voltages, fan tachometer/PWM, and individual GDDR6 memory chip temperatures), your Linux system needs the appropriate kernel modules:
 
-### 1. Recommended Operating System
-* **CachyOS (Recommended):** The official CachyOS BC-250 kernel (`linux-cachyos-bore-bc250` or `linux-cachyos`) includes native Oberon APU support and pre-packaged sensor drivers out of the box.
-* **Bazzite / SteamOS / Arch / Ubuntu:** Fully supported, provided the required DKMS modules below are loaded.
+### 1. Recommended Kernels & Distributions
+* **CachyOS with MastaG's BC-250 Kernels (Highly Recommended):** Developer **MastaG** integrates all Oberon APU fixes, frequency patches, and sensor modules across **all** of his CachyOS BC-250 kernels (not just BORE, but also standard `linux-cachyos-bc250`, `linux-cachyos-sched-ext-bc250`, etc.). If you are running any of MastaG's BC-250 kernels, all required sensor drivers (`nct6687`, `bc250_vrm 1.1.0+`, and `bc250_memory`) are already built-in and enabled out of the box!
+* **Other Kernels & Distros (Bazzite, SteamOS, Generic Arch, Ubuntu):** You do **not** need to do any physical jumper wire mods! You can simply install or update the sensor drivers via DKMS (see instructions below) to enable full PMBus/VRM access over the existing NCT6687 SMBus entirely in software.
 
 ### 2. Essential Kernel Modules
+
 * **`nct6687` (Super I/O Controller):**
   * **Telemetry:** Blower fan RPM, dynamic fan PWM duty cycle control, motherboard temperature, VRM MOS temperature diode, and 12V PCIe voltage rail.
   * **Loading:** Usually autoloaded by the kernel. You can manually load it with:
@@ -161,12 +162,34 @@ For **Cockpit Pro** to capture all hardware sensors (VRM power draw, voltages, f
 * **`bc250_vrm` (PMBus / VRM Controller):**
   * **Telemetry:** CPU & GPU core voltages (`Vout`), supply voltage (`Vin`), DrMOS current (`Iout`), active power draw (`Pout`), and VRM MOSFET phase temperatures.
   * **Zero Hardware Mod Required:** Version `1.1.0` or newer reads the Intersil PMBus controller directly over the NCT6687 SMBus path with **no soldering or jumper wires required**!
-  * **Source:** [Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms) (or pre-installed in CachyOS BC-250).
+  * **Source:** [Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms) (or pre-installed in MastaG's CachyOS BC-250 kernels).
   * *(Legacy Note: If `bc250_vrm` is not used, the daemon can fall back to direct I2C PMBus reading, which requires the physical jumper wire mod between `I2C_HEADER1` and `TPMS1` detailed in [hardware.md](hardware.md)).*
 
 * **`bc250_memory` (GDDR6 VRAM Telemetry):**
   * **Telemetry:** Individual temperatures for all 8 GDDR6 memory chips and memory hotspot tracking.
-  * **Source:** [Hexxeh/bc250-memory-dkms](https://github.com/Hexxeh/bc250-memory-dkms) (or pre-installed in CachyOS BC-250).
+  * **Source:** [Hexxeh/bc250-memory-dkms](https://github.com/Hexxeh/bc250-memory-dkms) (or pre-installed in MastaG's CachyOS BC-250 kernels).
+
+#### 🔧 Installing / Updating the Drivers via DKMS (For systems without MastaG's kernel):
+If you are on an OS without pre-installed drivers, run these commands to get sensor access without any hardware mods:
+
+```bash
+# 1. Install bc250-vrm-dkms (version 1.1.0+ enables jumper-free PMBus reading via NCT6687 SMBus):
+git clone https://github.com/Hexxeh/bc250-vrm-dkms.git
+cd bc250-vrm-dkms
+sudo make dkms-install
+sudo modprobe bc250_vrm
+cd ..
+
+# 2. Install bc250-memory-dkms (for 8-chip GDDR6 VRAM telemetry):
+git clone https://github.com/Hexxeh/bc250-memory-dkms.git
+cd bc250-memory-dkms
+sudo make dkms-install
+sudo modprobe bc250_memory
+cd ..
+
+# 3. Ensure NCT6687 Super I/O driver is active:
+sudo modprobe nct6687
+```
 
 ### 3. Verification Commands
 Before launching the installer, you can verify that your sensors are active:
@@ -351,7 +374,8 @@ Point CoolerControl to the `/run/apu_telemetry.json` sensor file to build custom
 ## 🤝 Upstream Heritage & Acknowledgements
 
 This project builds upon the foundational reverse-engineering and research by the open-source BC-250 community:
-* **[Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms)** — Pioneering NCT6687 SMBus driver implementation for the BC-250 PMIC.
+* **MastaG (Dennis Møller)** — Dedicated AMD BC-250 kernel maintenance, Oberon APU patch integration across all CachyOS BC-250 kernels, and hardware community enablement.
+* **[Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms)** — Pioneering NCT6687 SMBus driver implementation for the BC-250 PMIC and jumper-free VRM telemetry.
 * **[onlinermm/BC250-Telemetry](https://github.com/onlinermm/BC250-Telemetry)** — Original C++ daemon architecture and SMU mailbox reader.
 * **Titanium Studio Pro UI & PWA Edition** — Authored and refined by **Davidson Braga** with full mobile responsiveness, PWA architecture, custom Oberon icon suite, dual-mode cockpit, and dynamic CPU/GPU utilization telemetry.
 
