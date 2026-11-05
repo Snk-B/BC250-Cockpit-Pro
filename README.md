@@ -136,7 +136,7 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 | **Memory System** | 16 GB GDDR6 unified across a 256-bit bus (8 physical chips) |
 | **Super I/O Controller** | Nuvoton NCT6687D (manages fan PWM, tachometer, thermal diodes, and voltage sensing) |
 | **Power Inputs** | **Triple 12V Power Inputs** (1x Standard PCIe 8-pin + 2x Auxiliary Molex Micro-Fit 3.0 connectors for high-current overclock stability) |
-| **Supported OS** | CachyOS (all MastaG BC-250 kernels: standard, BORE, sched-ext), Bazzite, SteamOS, Arch Linux |
+| **Supported OS** | CachyOS (all [MastaG BC-250 kernels](https://github.com/MastaG/linux-cachyos-bc250): standard, BORE, sched-ext), Bazzite, SteamOS, Arch Linux |
 
 ---
 
@@ -147,7 +147,7 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 For **Cockpit Pro** to capture all hardware sensors (VRM power draw, voltages, fan tachometer/PWM, and individual GDDR6 memory chip temperatures), your Linux system needs the appropriate kernel modules:
 
 ### 1. Recommended Kernels & Distributions
-* **CachyOS with MastaG's BC-250 Kernels (Highly Recommended):** Developer **MastaG** integrates all Oberon APU fixes, frequency patches, and sensor modules across **all** of his CachyOS BC-250 kernels (not just BORE, but also standard `linux-cachyos-bc250`, `linux-cachyos-sched-ext-bc250`, etc.). If you are running any of MastaG's BC-250 kernels, all required sensor drivers (`nct6687`, `bc250_vrm 1.1.0+`, and `bc250_memory`) are already built-in and enabled out of the box!
+* **CachyOS with [MastaG's BC-250 Kernels](https://github.com/MastaG/linux-cachyos-bc250) (Highly Recommended):** Developer **[MastaG](https://github.com/MastaG/linux-cachyos-bc250)** integrates all Oberon APU fixes, frequency patches, and sensor modules across **all** of his CachyOS BC-250 kernels (not just BORE, but also standard `linux-cachyos-bc250`, `linux-cachyos-sched-ext-bc250`, etc.). If you are running any of MastaG's BC-250 kernels, all required sensor drivers (`nct6687`, `bc250_vrm 1.1.0+`, and `bc250_memory`) are already built-in and enabled out of the box!
 * **Other Kernels & Distros (Bazzite, SteamOS, Generic Arch, Ubuntu):** You do **not** need to do any physical jumper wire mods! You can simply install or update the sensor drivers via DKMS (see instructions below) to enable full PMBus/VRM access over the existing NCT6687 SMBus entirely in software.
 
 ### 2. Essential Kernel Modules
@@ -374,7 +374,7 @@ Point CoolerControl to the `/run/apu_telemetry.json` sensor file to build custom
 ## 🤝 Upstream Heritage & Acknowledgements
 
 This project builds upon the foundational reverse-engineering and research by the open-source BC-250 community:
-* **MastaG (Dennis Møller)** — Dedicated AMD BC-250 kernel maintenance, Oberon APU patch integration across all CachyOS BC-250 kernels, and hardware community enablement.
+* **[MastaG (Dennis Møller)](https://github.com/MastaG/linux-cachyos-bc250)** — Dedicated AMD BC-250 kernel maintenance ([linux-cachyos-bc250](https://github.com/MastaG/linux-cachyos-bc250)), Oberon APU patch integration across all CachyOS BC-250 kernels, and hardware community enablement.
 * **[Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms)** — Pioneering NCT6687 SMBus driver implementation for the BC-250 PMIC and jumper-free VRM telemetry.
 * **[onlinermm/BC250-Telemetry](https://github.com/onlinermm/BC250-Telemetry)** — Original C++ daemon architecture and SMU mailbox reader.
 * **Titanium Studio Pro UI & PWA Edition** — Authored and refined by **Davidson Braga** with full mobile responsiveness, PWA architecture, custom Oberon icon suite, dual-mode cockpit, and dynamic CPU/GPU utilization telemetry.
