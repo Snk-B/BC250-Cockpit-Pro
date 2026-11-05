@@ -1,10 +1,10 @@
 {
-  "id": "/v2/",
+  "id": "/",
   "name": "AMD BC-250 Telemetry",
   "short_name": "BC-250",
   "description": "Industrial Real-Time Telemetry Cockpit for AMD BC-250",
-  "start_url": "/v2/",
-  "scope": "/v2/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#060912",

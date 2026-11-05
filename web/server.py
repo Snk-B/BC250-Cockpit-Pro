@@ -10,25 +10,6 @@ import telemetry
 PORT = int(os.environ.get("BC250_WEB_PORT", 8090))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
-# Which dashboard to serve at "/": v1 (classic, default) or v2
-# (animated board diagram). We check this ONCE at startup, not on every
-# request — and deliberately verify that v2/index.html actually exists on
-# disk: if the env var is garbled, stale (an old build without v2/), or
-# just unrecognized, we quietly fall back to v1 instead of 404ing or
-# crashing on "/".
-_requested_dashboard = os.environ.get("BC250_DEFAULT_DASHBOARD", "v1").strip().lower()
-if _requested_dashboard == "v2":
-    if os.path.isfile(os.path.join(DIRECTORY, "v2", "index.html")):
-        DEFAULT_DASHBOARD = "v2"
-    else:
-        print(f"[WARN] BC250_DEFAULT_DASHBOARD=v2, but {DIRECTORY}/v2/index.html was not found — falling back to v1.")
-        DEFAULT_DASHBOARD = "v1"
-elif _requested_dashboard == "v1":
-    DEFAULT_DASHBOARD = "v1"
-else:
-    print(f"[WARN] Unrecognized BC250_DEFAULT_DASHBOARD={_requested_dashboard!r} — falling back to v1.")
-    DEFAULT_DASHBOARD = "v1"
-
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
@@ -61,34 +42,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # The daemon owns the complete snapshot, including memory telemetry.
         if self.path == '/api/telemetry':
             snapshot = telemetry.read_telemetry()
-            # A missing/corrupt snapshot degrades to an error object; report
-            # it as 503 so monitoring can tell a broken daemon from a healthy
-            # one. The frontend already treats any error body as a failure.
             self._send_json(snapshot, 503 if 'error' in snapshot else 200, allow_nan=False)
-        # Core/CU counts: queried fresh per request, not cached — the
-        # frontend only calls this once per page load, so there's no need to
-        # cache it server-side, and a fresh read means a live WGP/core
-        # unlock shows up correctly if the page happens to be reloaded.
         elif self.path == '/api/topology':
             self._send_json(topology.read_topology())
-        # Same once-per-page-load cadence as /api/topology — this is config
-        # state (an OC file edit, a service (de)activation), not telemetry.
         elif self.path == '/api/overclock':
             self._send_json(overclock.read_overclock())
-        elif (self.path == '/' or self.path.startswith('/?')) and DEFAULT_DASHBOARD == 'v2':
-            query = self.path[1:] if self.path.startswith('/?') else ''
-            self.send_response(302)
-            self.send_header('Location', '/v2/' + query)
+        elif self.path == '/v2' or self.path == '/v2/' or self.path.startswith('/v2/?'):
+            # Legacy /v2 redirect to root "/"
+            query = self.path[4:] if self.path.startswith('/v2/?') else ''
+            self.send_response(301)
+            self.send_header('Location', '/' + query)
+            self.end_headers()
+        elif self.path.startswith('/v2/'):
+            # Redirect any /v2/<file> to /<file>
+            clean_path = self.path[3:]
+            self.send_response(301)
+            self.send_header('Location', clean_path)
             self.end_headers()
         else:
-            # Fall through to serving regular static files (index.html, style.css)
+            # Fall through to serving regular static files (index.html, style.css, etc.)
             super().do_GET()
 
 def main():
     print("=========================================")
-    print(f" Web server running on port {PORT}")
-    print(f" Open in your browser: http://localhost:{PORT}")
-    print(f" Default dashboard at \"/\": {DEFAULT_DASHBOARD}")
+    print(f" BC-250 Cockpit Pro Web Server running on port {PORT}")
+    print(f" Dashboard URL: http://localhost:{PORT}/")
     print("=========================================")
 
     # Allow instant server restarts instead of waiting for the kernel to release the port
@@ -100,7 +78,6 @@ def main():
             httpd.serve_forever()
         except KeyboardInterrupt:
             print("\nServer stopped.")
-
 
 if __name__ == '__main__':
     main()

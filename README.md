@@ -147,8 +147,8 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 Run the automated installer on your BC-250:
 
 ```bash
-git clone https://github.com/davidsonbraga/BC250-Telemetry.git
-cd BC250-Telemetry
+git clone https://github.com/Snk-B/BC250-Cockpit-Pro.git
+cd BC250-Cockpit-Pro
 sudo ./install.sh
 ```
 
@@ -178,7 +178,7 @@ The installer will:
 3. **Access the Dashboard:**
    Open your browser and navigate to:
    ```text
-   http://<YOUR_BC250_IP>:8090/v2/
+   http://<YOUR_BC250_IP>:8090/
    ```
 
 ---
@@ -190,7 +190,7 @@ To run the cockpit on your smartphone as a native, full-screen app:
 1. Connect your phone to the same local Wi-Fi / LAN as the BC-250.
 2. Open Google Chrome (or Edge/Samsung Internet) and visit:
    ```text
-   http://<YOUR_BC250_IP>:8090/v2/
+   http://<YOUR_BC250_IP>:8090/
    ```
 3. **Enable Local Network PWA Installation (Chrome Android):**
    * In Chrome, open `chrome://flags`.
@@ -288,7 +288,18 @@ The daemon writes `/run/apu_telemetry.json` continuously, allowing MangoHud to d
 
 Add to your `~/.config/MangoHud/MangoHud.conf`:
 ```ini
-exec=python3 /home/davidson/BC250-Telemetry/mangohud/bc250_mangohud.py
+# Option 1: Direct kernel sensor reader (recommended, zero overhead)
+custom_text=CPU VRM
+exec=cat /run/bc250/cpu_vrm_c
+custom_text=GPU VRM
+exec=cat /run/bc250/gpu_vrm_c
+custom_text=VRM Power
+exec=cat /run/bc250/total_power
+custom_text=MEM MAX
+exec=cat /run/bc250/memory_hotspot_c
+
+# Option 2: Script wrapper (replace <your-user> with your Linux username)
+# exec=python3 /home/<your-user>/BC250-Cockpit-Pro/mangohud/bc250_mangohud.py
 ```
 
 ### CoolerControl

@@ -1,28 +1,29 @@
 // AMD BC-250 Titanium Studio Service Worker
-const CACHE_NAME = 'bc250-v2-cache-v3';
+const CACHE_NAME = 'bc250-cache-v4';
 const STATIC_ASSETS = [
-  '/v2/',
-  '/v2/index.html',
-  '/v2/style.css?v=2.3',
-  '/v2/bc250-board.css',
-  '/v2/memory.js',
-  '/v2/app.js?v=2.3',
-  '/v2/manifest.json',
-  '/v2/favicon.ico',
-  '/v2/favicon-32x32.png',
-  '/v2/favicon-16x16.png',
-  '/v2/icon-192.png',
-  '/v2/icon-512.png',
-  '/v2/apple-touch-icon.png'
+  '/',
+  '/index.html',
+  '/style.css?v=2.4',
+  '/bc250-board.css?v=2.4',
+  '/memory.js?v=2.4',
+  '/app.js?v=2.4',
+  '/manifest.json',
+  '/favicon.ico',
+  '/favicon-32x32.png',
+  '/favicon-16x16.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS).catch((err) => {
         console.warn('SW pre-cache warning:', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 

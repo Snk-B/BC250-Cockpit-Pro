@@ -254,72 +254,23 @@ fi
 echo -e "${GREEN}✓ Done!${NC}\n"
 
 if [ "$COMPONENT_WEB" = 1 ]; then
-echo -e "${YELLOW}[STEP 5/7]${NC} Choosing the default dashboard..."
-# Priority order: --dashboard=... > env BC250_DEFAULT_DASHBOARD > whatever was
-# already set in a previously installed unit (so that running `./install.sh`
-# again for an update doesn't silently reset the user's choice back to v1) >
-# interactive prompt > v1.
-EXISTING_DASHBOARD=""
-if [ -f /etc/systemd/system/bc250-web.service ]; then
-    EXISTING_LINE=$(grep '^Environment=BC250_DEFAULT_DASHBOARD=' /etc/systemd/system/bc250-web.service 2>/dev/null || true)
-    # Strip "Environment=" and "BC250_DEFAULT_DASHBOARD=" one at a time —
-    # without grep -P/-o, so we don't depend on a PCRE-enabled grep build.
-    EXISTING_DASHBOARD="${EXISTING_LINE#*=}"
-    EXISTING_DASHBOARD="${EXISTING_DASHBOARD#*=}"
-fi
-FALLBACK_DASHBOARD="${EXISTING_DASHBOARD:-v1}"
-
-if [ -n "$DASHBOARD_FLAG" ]; then
-    CHOSEN_DASHBOARD="$DASHBOARD_FLAG"
-    echo -e "  -> Flag --dashboard=$CHOSEN_DASHBOARD"
-elif [ -n "${BC250_DEFAULT_DASHBOARD:-}" ]; then
-    CHOSEN_DASHBOARD="$BC250_DEFAULT_DASHBOARD"
-    echo -e "  -> Environment variable BC250_DEFAULT_DASHBOARD=$CHOSEN_DASHBOARD"
-elif [ -t 0 ]; then
-    echo -e "  1) v1 — classic HUD"
-    echo -e "  2) v2 — animated board diagram"
-    # -t 30: if stdin is technically a terminal but no answer will ever come
-    # (e.g. an automated run under a pty) — don't hang forever, just quietly
-    # fall back to the current/default value, same as for a non-TTY.
-    read -r -t 30 -p "  Which one to show on http://<ip>:8090/? [1/2, Enter = current: $FALLBACK_DASHBOARD]: " ANSWER || ANSWER=""
-    case "$ANSWER" in
-        1) CHOSEN_DASHBOARD="v1" ;;
-        2) CHOSEN_DASHBOARD="v2" ;;
-        "") CHOSEN_DASHBOARD="$FALLBACK_DASHBOARD" ;;
-        *) CHOSEN_DASHBOARD="$ANSWER" ;;
-    esac
-else
-    CHOSEN_DASHBOARD="$FALLBACK_DASHBOARD"
-fi
-
-# We accept exactly "v1"/"v2" — anything else (a typo, a corrupted
-# environment variable) has no right to stop the install, it should just fall
-# back to a safe default.
-if [ "$CHOSEN_DASHBOARD" != "v1" ] && [ "$CHOSEN_DASHBOARD" != "v2" ]; then
-    echo -e "${YELLOW}⚠ Unrecognized dashboard value \"$CHOSEN_DASHBOARD\", using v1.${NC}"
-    CHOSEN_DASHBOARD="v1"
-fi
-echo -e "${GREEN}✓ The default on \"/\" will be: $CHOSEN_DASHBOARD${NC}\n"
-
-echo -e "${YELLOW}[STEP 6/7]${NC} Installing the web server..."
+echo -e "${YELLOW}[STEP 5/6]${NC} Installing the web server..."
 echo -e "  -> Copying and configuring the bc250-web.service unit"
 CURRENT_USER="${SUDO_USER:-$(whoami)}"
 if [ -z "${SUDO_USER:-}" ]; then
     echo -e "${YELLOW}⚠ \$SUDO_USER is not set (running as root directly instead of via 'sudo'?) — bc250-web.service will run as \"$CURRENT_USER\".${NC}"
 fi
 sed -e "s|TELEMETRY_USER|$CURRENT_USER|g" -e "s|TELEMETRY_WEB_DIR|$SCRIPT_DIR/web|g" \
-    -e "s|TELEMETRY_DEFAULT_DASHBOARD|$CHOSEN_DASHBOARD|g" \
     web/bc250-web.service | sudo tee /etc/systemd/system/bc250-web.service > /dev/null
 echo -e "${GREEN}✓ Done!${NC}\n"
 else
-    CHOSEN_DASHBOARD=""
-    echo "  -> Preserving existing web service, dashboard config, and web files"
+    echo "  -> Preserving existing web service and web files"
 fi
 
 # enable by itself doesn't restart an already-active service (it only enables
 # autostart) — so for a freshly built binary/unit we explicitly restart it,
 # otherwise the old service would keep running with the old code in memory.
-echo -e "${YELLOW}[STEP 7/7]${NC} Starting the services..."
+echo -e "${YELLOW}[STEP 6/6]${NC} Starting the services..."
 if [ "$COMPONENT_MEMORY" = 1 ] && [ "$MEMORY_ENABLED" = "1" ]; then
     echo "  -> Installing the separate SMU patch and memory collector service"
     # Stop before replacing Python modules. The per-boot operation guard lives
@@ -415,14 +366,8 @@ fi
 echo -e "Your monitoring is now running. Data lives in /run/apu_telemetry.json."
 echo -e "Memory is included in the same JSON file; /api/telemetry serves that snapshot."
 echo -e "PMBus/VRM (+ GDDR6, if enabled) sensors for CoolerControl/MangoHud: /run/bc250/ (see mangohud/MangoHud-bc250.conf)"
-if [ "$CHOSEN_DASHBOARD" = "v2" ]; then
-    echo -e "Web UI (default v2 — animated board diagram): http://localhost:8090"
-    echo -e "The classic HUD (v1) is still available at http://localhost:8090/index.html"
-else
-    echo -e "Web UI: http://localhost:8090"
-    echo -e "The animated board diagram (v2) is available at http://localhost:8090/v2/"
-fi
-echo -e "To change the choice later: ${YELLOW}sudo ./install.sh --dashboard=v1${NC} (or v2)"
+echo -e "Web Cockpit UI: http://localhost:8090/"
+echo -e "Access from any device on your LAN: http://<YOUR_BC250_IP>:8090/""
 echo -e "Settings (sensor sources, polling): ${YELLOW}/etc/bc250-telemetry.conf${NC} — apply with ${YELLOW}sudo systemctl reload apu-telemetry${NC}"
 echo -e "To check the status, you can use:"
 echo -e "  systemctl status apu-telemetry"

@@ -1,5 +1,5 @@
 [Unit]
-Description=BC-250 Telemetry Web Monitor
+Description=BC-250 Cockpit Pro Web Monitor
 After=network.target apu-telemetry.service
 Wants=apu-telemetry.service
 
@@ -7,7 +7,6 @@ Wants=apu-telemetry.service
 Type=simple
 User=TELEMETRY_USER
 WorkingDirectory=TELEMETRY_WEB_DIR
-Environment=BC250_DEFAULT_DASHBOARD=TELEMETRY_DEFAULT_DASHBOARD
 ExecStart=/usr/bin/python3 TELEMETRY_WEB_DIR/server.py
 Restart=always
 RestartSec=3
