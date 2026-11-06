@@ -40,6 +40,7 @@ assert_equals "1" "$COMPONENT_DAEMON" "default plan includes daemon"
 assert_equals "1" "$COMPONENT_WEB" "default plan includes web"
 assert_equals "1" "$COMPONENT_MEMORY" "default plan includes memory choice"
 assert_equals "1" "$COMPONENT_NUVOTON" "default plan includes sensor setup"
+assert_equals "1" "$COMPONENT_PLASMA" "default plan includes plasma widgets"
 parse_install_args --components=daemon,unknown
 if resolve_install_components 2>/dev/null; then
     echo "ASSERTION FAILED: unknown component must be rejected" >&2

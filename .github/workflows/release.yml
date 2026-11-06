@@ -66,7 +66,7 @@ jobs:
           BUNDLE=BC250-Cockpit-Pro
           mkdir -p "dist/$BUNDLE"
           cp apu_telemetry bc250_telemetry.cpp daemon_log.h memory_telemetry.h sysfs_util.h telemetry_config.h vrm_backend.h install.sh install-lib.sh uninstall.sh apu-telemetry.service README.md LICENSE hardware.md "dist/$BUNDLE/"
-          cp -r web images memory mangohud "dist/$BUNDLE/"
+          cp -r web images memory mangohud plasma "dist/$BUNDLE/"
           chmod +x "dist/$BUNDLE/apu_telemetry" "dist/$BUNDLE/install.sh" "dist/$BUNDLE/uninstall.sh"
           tar -C dist -czf BC250-Cockpit-Pro.tar.gz "$BUNDLE"
           cp BC250-Cockpit-Pro.tar.gz bc250-telemetry.tar.gz
