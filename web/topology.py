@@ -9,6 +9,7 @@ checking it doesn't require rebuilding and reinstalling the C++ binary.
 
 import ctypes
 import os
+import platform
 import re
 import subprocess
 
@@ -150,6 +151,7 @@ def read_topology():
         'cpu_physical_cores': read_cpu_physical_cores(),
         'cpu_logical_cores': read_cpu_threads(),
         'gpu_cu_active': read_gpu_cu_active(),
+        'kernel_release': platform.release(),
     }
 
 

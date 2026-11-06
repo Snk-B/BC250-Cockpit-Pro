@@ -40,6 +40,8 @@ if command -v kpackagetool6 >/dev/null 2>&1; then
 fi
 sudo rm -rf /usr/share/plasma/plasmoids/org.cachyos.bc250.cockpit
 rm -rf "$HOME/.local/share/plasma/plasmoids/org.cachyos.bc250.cockpit"
+sudo rm -f /usr/share/icons/hicolor/*/apps/org.cachyos.bc250.cockpit.*
+rm -f "$HOME/.local/share/icons/hicolor/*/apps/org.cachyos.bc250.cockpit.*"
 
 echo -e "${YELLOW}[STEP 3/4]${NC} Removing the binary..."
 sudo rm -f "$BIN_PATH"

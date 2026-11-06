@@ -319,6 +319,20 @@ if [ "$COMPONENT_PLASMA" = 1 ]; then
     sudo cp -r "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" "$PLASMA_DIR"
     sudo chmod -R 755 "$PLASMA_DIR"
 
+    # Install official icon into hicolor themes
+    echo -e "  -> Installing application icon suite into hicolor theme"
+    sudo mkdir -p "/usr/share/icons/hicolor/scalable/apps"
+    [ -f "$SCRIPT_DIR/web/favicon-pulse.svg" ] && sudo cp -f "$SCRIPT_DIR/web/favicon-pulse.svg" "/usr/share/icons/hicolor/scalable/apps/org.cachyos.bc250.cockpit.svg"
+    for s in 16 24 32 48 64 128 256 512; do
+        sudo mkdir -p "/usr/share/icons/hicolor/${s}x${s}/apps"
+        if [ -f "$SCRIPT_DIR/images/app-icon.png" ] && command -v convert >/dev/null 2>&1; then
+            sudo convert "$SCRIPT_DIR/images/app-icon.png" -resize "${s}x${s}" "/usr/share/icons/hicolor/${s}x${s}/apps/org.cachyos.bc250.cockpit.png" 2>/dev/null || true
+        elif [ -f "$SCRIPT_DIR/web/icon-192.png" ]; then
+            sudo cp -f "$SCRIPT_DIR/web/icon-192.png" "/usr/share/icons/hicolor/${s}x${s}/apps/org.cachyos.bc250.cockpit.png" 2>/dev/null || true
+        fi
+    done
+    command -v gtk-update-icon-cache >/dev/null 2>&1 && sudo gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor 2>/dev/null || true
+
     if command -v kpackagetool6 >/dev/null 2>&1; then
         echo -e "  -> Registering plasmoid package via kpackagetool6"
         sudo kpackagetool6 -g -t Plasma/Applet --upgrade "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" 2>/dev/null || sudo kpackagetool6 -g -t Plasma/Applet --install "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" 2>/dev/null || true

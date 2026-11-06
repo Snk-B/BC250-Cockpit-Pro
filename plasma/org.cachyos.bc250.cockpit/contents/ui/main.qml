@@ -82,6 +82,7 @@ PlasmoidItem {
         triggeredOnStart: true
         onTriggered: {
             fetchOverclock();
+            fetchTopology();
         }
     }
 
@@ -156,15 +157,25 @@ PlasmoidItem {
         xhr.send();
     }
 
-    Component.onCompleted: {
-        // Read kernel version string once
+    function fetchTopology() {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "file:///proc/sys/kernel/osrelease", true);
+        var url = (Plasmoid.configuration.serverUrl || "http://127.0.0.1:8090") + "/api/topology";
+        xhr.open("GET", url, true);
+        xhr.timeout = 3000;
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                root.kernelRelease = xhr.responseText.trim();
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.kernel_release) {
+                        root.kernelRelease = data.kernel_release;
+                    }
+                } catch (e) {}
             }
         };
-        try { xhr.send(); } catch (e) {}
+        xhr.send();
+    }
+
+    Component.onCompleted: {
+        fetchTopology();
     }
 }

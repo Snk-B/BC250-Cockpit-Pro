@@ -16,7 +16,7 @@
       "horizontal",
       "vertical"
     ],
-    "Icon": "sensors-temperature-symbolic",
+    "Icon": "org.cachyos.bc250.cockpit",
     "Id": "org.cachyos.bc250.cockpit",
     "License": "GPL-3.0+",
     "Name": "BC-250 Cockpit Pro",
