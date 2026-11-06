@@ -257,9 +257,9 @@ binary_has_feature() {
 # Resolve an explicit component list into flags. Default preserves the original
 # full install behavior; omitted optional components are preserved, never removed.
 resolve_install_components() {
-    COMPONENT_DAEMON=0 COMPONENT_WEB=0 COMPONENT_MEMORY=0 COMPONENT_NUVOTON=0
-    local list="${COMPONENTS_FLAG:-daemon,web,memory,nuvoton}" item
-    [ -n "$COMPONENTS_FLAG" ] || list="daemon,web,memory,nuvoton"
+    COMPONENT_DAEMON=0 COMPONENT_WEB=0 COMPONENT_MEMORY=0 COMPONENT_NUVOTON=0 COMPONENT_PLASMA=0
+    local list="${COMPONENTS_FLAG:-daemon,web,memory,nuvoton,plasma}" item
+    [ -n "$COMPONENTS_FLAG" ] || list="daemon,web,memory,nuvoton,plasma"
     local IFS=,
     for item in $list; do
         case "$item" in
@@ -267,6 +267,7 @@ resolve_install_components() {
             web) COMPONENT_WEB=1 ;;
             memory) COMPONENT_MEMORY=1 ;;
             nuvoton) COMPONENT_NUVOTON=1 ;;
+            plasma) COMPONENT_PLASMA=1 ;;
             "") echo "Empty component name" >&2; return 1 ;;
             *) echo "Unknown install component: $item" >&2; return 1 ;;
         esac
@@ -280,6 +281,7 @@ print_install_plan() {
     [ "$COMPONENT_WEB" = 1 ] && selected="${selected:+$selected,}web"
     [ "$COMPONENT_MEMORY" = 1 ] && selected="${selected:+$selected,}memory"
     [ "$COMPONENT_NUVOTON" = 1 ] && selected="${selected:+$selected,}nuvoton"
+    [ "$COMPONENT_PLASMA" = 1 ] && selected="${selected:+$selected,}plasma"
     printf 'Install components: %s\n' "$selected"
     [ "$COMPONENT_MEMORY" = 1 ] && printf 'Memory mode: %s\n' "$MEMORY_MODE_FLAG"
     [ "$COMPONENT_WEB" = 1 ] || printf 'Preserve existing web service and dashboard config\n'

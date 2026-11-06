@@ -24,6 +24,19 @@ Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite*
 
 ---
 
+
+### 🐧 KDE Plasma 6 Cyber Widgets Suite (Native CachyOS)
+
+| CachyOS KDE Plasma 6 Widgets Suite |
+| :---: |
+| ![KDE Plasma 6 Widgets Suite](images/cachyos_kde_widgets_v4_showcase.jpg) |
+
+| Concept 1: Desktop HUD | Concept 4: Horizontal Dock | Concept 3: Tray Flyout | Concept 2: Taskbar Pill |
+| :---: | :---: | :---: | :---: |
+| <img src="images/widget_v4_concept1_desktop_hud.jpg" width="210" /> | <img src="images/widget_v4_concept4_horizontal_dock.jpg" width="210" /> | <img src="images/widget_v4_concept3_tray_flyout.jpg" width="210" /> | <img src="images/widget_v4_concept2_taskbar_pill.jpg" width="210" /> |
+
+---
+
 ## ⚡ Key Innovations & Features
 
 ### 1. 🎛️ Dual-Mode Cockpit (Basic vs. Advanced)
@@ -46,6 +59,16 @@ Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite*
 * **Individual Chip Readouts:** Direct telemetry for all 8 GDDR6 physical memory chips (`#0` through `#7`) via SMU queue 3 mailbox interrogation.
 * **Dynamic Hotspot Highlighting:** Automatically calculates the board average and flags the hottest physical memory chip with an illuminated warning badge and distinct outline.
 * **Mobile-Responsive 2-Column Grid:** Automatically switches from 4 columns to 2 columns on mobile viewports (`<= 600px`), completely eliminating numeric overlap (`#0 52 °C`).
+
+### 6. 🐧 Native KDE Plasma 6 Cyber Widgets Suite
+* **All-in-One Smart Plasmoid (`org.cachyos.bc250.cockpit`):** Automatically detects whether it is running on the Desktop or in the Taskbar panel, seamlessly adapting its UI representation.
+* **4 Turnkey Layouts:**
+  * **Concept 1 — Desktop HUD Widget:** Dedicated hero dials for CPU Die, GPU Die, and VRAM Hotspot, dynamic live frequency curves, and a 4-engine silicon matrix with glow aesthetics.
+  * **Concept 2 — Taskbar Pill:** Ultra-compact panel status capsule showing CPU, GPU, VRM, and Fan speeds with live clock readouts.
+  * **Concept 3 — Tray Pop-up Flyout:** Interactive system tray menu with stacked CPU/GPU sparklines, 8-chip GDDR6 heatmap, board power draw, and a one-click launcher for Cockpit Pro Web.
+  * **Concept 4 — Horizontal Compact Dock:** Multi-tile horizontal deck for dual frequency and thermal monitoring.
+* **100% Native & Hardware-Accelerated:** Written in pure Qt 6 / QML, rendered via Vulkan/OpenGL at monitor refresh rate with near-zero CPU and RAM overhead.
+* **Turnkey Single-Package Setup:** Bundled directly into `install.sh`, registering the widget automatically for instant use in the KDE Plasma 6 "Add Widgets" menu.
 
 ### 5. 🔬 Comprehensive Sensor Fusion & Engine
 * **VRM PMBus Sensors:** Reads CPU rail and GPU rail voltages (`vin`, `vout`), currents (`iout`), active power (`pout`), and VRM MOSFET temperatures directly from `bc250_vrm` (NCT6687 SMBus without hardware mods on v1.1.0+) or direct PMBus at `0x60`.

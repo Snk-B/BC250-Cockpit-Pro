@@ -33,6 +33,14 @@ sudo systemctl daemon-reload
 sudo systemctl reset-failed 2>/dev/null || true
 echo -e "${GREEN}✓ Service configs removed!${NC}\n"
 
+echo -e "  -> Removing KDE Plasma 6 widgets..."
+if command -v kpackagetool6 >/dev/null 2>&1; then
+    sudo kpackagetool6 -g -t Plasma/Applet --remove org.cachyos.bc250.cockpit 2>/dev/null || true
+    kpackagetool6 -t Plasma/Applet --remove org.cachyos.bc250.cockpit 2>/dev/null || true
+fi
+sudo rm -rf /usr/share/plasma/plasmoids/org.cachyos.bc250.cockpit
+rm -rf "$HOME/.local/share/plasma/plasmoids/org.cachyos.bc250.cockpit"
+
 echo -e "${YELLOW}[STEP 3/4]${NC} Removing the binary..."
 sudo rm -f "$BIN_PATH"
 sudo rmdir "$(dirname "$BIN_PATH")" 2>/dev/null || true # remove /opt/bc250-telemetry if it's empty

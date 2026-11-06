@@ -1,0 +1,31 @@
+{
+  "KPackageStructure": "Plasma/Applet",
+  "KPlugin": {
+    "Authors": [
+      {
+        "Email": "davidson@cachyos.org",
+        "Name": "Davidson Braga"
+      }
+    ],
+    "BugReportUrl": "https://github.com/Snk-B/BC250-Cockpit-Pro/issues",
+    "Category": "System Information",
+    "Description": "BC-250 Oberon APU Live Hardware, Power & Thermal Telemetry Monitor for CachyOS",
+    "EnabledByDefault": true,
+    "FormFactors": [
+      "planar",
+      "horizontal",
+      "vertical"
+    ],
+    "Icon": "sensors-temperature-symbolic",
+    "Id": "org.cachyos.bc250.cockpit",
+    "License": "GPL-3.0+",
+    "Name": "BC-250 Cockpit Pro",
+    "Version": "1.0.0",
+    "Website": "https://github.com/Snk-B/BC250-Cockpit-Pro"
+  },
+  "X-Plasma-API-Minimum-Version": "6.0",
+  "X-Plasma-MainScript": "ui/main.qml",
+  "X-Plasma-Provides": [
+    "org.kde.plasma.systemmonitor"
+  ]
+}

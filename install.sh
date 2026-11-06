@@ -310,6 +310,22 @@ elif [ -f /etc/systemd/system/bc250-memory.service ] &&
     # it) so a same-boot reinstall cannot retry an interrupted SMU operation.
 fi
 echo -e "  -> Reloading systemd, enabling autostart, and (re)starting the services"
+
+if [ "$COMPONENT_PLASMA" = 1 ]; then
+    echo -e "${YELLOW}[STEP 6/6]${NC} Installing KDE Plasma 6 Widgets..."
+    PLASMA_DIR="/usr/share/plasma/plasmoids/org.cachyos.bc250.cockpit"
+    sudo rm -rf "$PLASMA_DIR"
+    sudo mkdir -p "/usr/share/plasma/plasmoids"
+    sudo cp -r "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" "$PLASMA_DIR"
+    sudo chmod -R 755 "$PLASMA_DIR"
+
+    if command -v kpackagetool6 >/dev/null 2>&1; then
+        echo -e "  -> Registering plasmoid package via kpackagetool6"
+        sudo kpackagetool6 -g -t Plasma/Applet --upgrade "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" 2>/dev/null || sudo kpackagetool6 -g -t Plasma/Applet --install "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" 2>/dev/null || true
+    fi
+    echo -e "${GREEN}✓ KDE Plasma 6 widget installed to $PLASMA_DIR!${NC}\n"
+fi
+
 sudo systemctl daemon-reload
 if ! sudo systemctl enable apu-telemetry.service; then
     echo -e "${YELLOW}⚠ Failed to enable the daemon service for autostart — it may not survive a reboot. Continuing anyway.${NC}"
@@ -367,6 +383,7 @@ echo -e "Your monitoring is now running. Data lives in /run/apu_telemetry.json."
 echo -e "Memory is included in the same JSON file; /api/telemetry serves that snapshot."
 echo -e "PMBus/VRM (+ GDDR6, if enabled) sensors for CoolerControl/MangoHud: /run/bc250/ (see mangohud/MangoHud-bc250.conf)"
 echo -e "Web Cockpit UI: http://localhost:8090/"
+echo -e "KDE Plasma 6 Widget: Available in Desktop/Panel \"Add Widgets\" as \"BC-250 Cockpit Pro\""
 echo -e "Access from any device on your LAN: http://<YOUR_BC250_IP>:8090/"
 echo -e "Settings (sensor sources, polling): ${YELLOW}/etc/bc250-telemetry.conf${NC} — apply with ${YELLOW}sudo systemctl reload apu-telemetry${NC}"
 echo -e "To check the status, you can use:"
