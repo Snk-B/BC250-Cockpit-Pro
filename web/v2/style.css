@@ -823,7 +823,7 @@ body {
 
 .gddr6-sum-label { font-size: 9px; color: #94a3b8; text-transform: uppercase; }
 
-.gddr6-sum-val { font-size: 15px; font-weight: 800; color: #f1f5f9; }
+.gddr6-sum-val { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 15px; font-weight: 800; color: #f1f5f9; }
 
 .gddr6-sum-val.hotspot { color: var(--c2-orange); }
 
@@ -2370,15 +2370,12 @@ body {
 }
 
 .trio-num-main {
-
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
     font-size: 21px;
-
     font-weight: 800;
-
     color: #f8fafc;
-
     line-height: 1;
-
 }
 
 .trio-unit-sup {
