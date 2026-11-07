@@ -3,7 +3,7 @@
 An optional root service patches SMU at startup and reads eight memory chips
 every three seconds. It is separate from `apu_telemetry` and the web server.
 It uses Python's standard library only; no pip packages or runtime downloads.
-The v2 dashboard displays all eight chip temperatures, average and hotspot.
+The Cockpit Pro dashboard displays all eight chip temperatures, average and hotspot.
 Unavailable/stale readings show dashes, and sensor saturation is marked with
 `≥`. The board illustration shows temperature halos and outlines all tied
 hotspots. Halos disappear when readings are unavailable or stale.
@@ -117,7 +117,7 @@ only reads that file and never accesses SMU.
 }
 ```
 
-Indices 0..7 are upstream UMC/chip indices. The v2 illustration uses the board
+Indices 0..7 are upstream UMC/chip indices. The Cockpit Pro board illustration uses the board
 owner's supplied top/X-ray mapping: 0=A/U27 (lower left), 1=B/U29 (bottom left
 center), 2=C/U31 (bottom right center), 3=D/U33 (lower right), 4=E/U43 (upper
 right), 5=F/U41 (top right center), 6=G/U39 (top left center), 7=H/U37 (upper

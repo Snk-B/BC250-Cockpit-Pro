@@ -58,20 +58,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._send_json(topology.read_topology())
         elif self.path == '/api/overclock':
             self._send_json(overclock.read_overclock())
-        elif self.path == '/v2' or self.path == '/v2/' or self.path.startswith('/v2/?'):
-            # Legacy /v2 redirect to root "/"
-            query = self.path[4:] if self.path.startswith('/v2/?') else ''
-            self.send_response(301)
-            self.send_header('Location', '/' + query)
-            self.end_headers()
-        elif self.path.startswith('/v2/'):
-            # Redirect any /v2/<file> to /<file>
-            clean_path = self.path[3:]
-            self.send_response(301)
-            self.send_header('Location', clean_path)
-            self.end_headers()
         else:
-            # Fall through to serving regular static files (index.html, style.css, etc.)
+            # Serve Cockpit Pro static files (index.html, style.css, app.js, etc.)
             super().do_GET()
 
 def main():

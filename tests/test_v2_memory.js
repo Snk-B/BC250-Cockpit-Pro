@@ -94,8 +94,8 @@ function testV2Memory(source, html) {
 if (typeof require === 'function' && require.main === module) {
     const fs = require('fs');
     const path = require('path');
-    const root = path.join(__dirname, '..', 'web', 'v2');
+    const root = path.join(__dirname, '..', 'web');
     const checks = testV2Memory(fs.readFileSync(path.join(root, 'memory.js'), 'utf8'),
         fs.readFileSync(path.join(root, 'index.html'), 'utf8'));
-    console.log(`v2 memory checks passed (${checks} assertions)`);
+    console.log(`Cockpit Pro memory checks passed (${checks} assertions)`);
 }

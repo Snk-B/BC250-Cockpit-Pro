@@ -1,7 +1,7 @@
 const state = {};
 const SMOOTHING = 0.08;
 const SMOOTHING_CRISP = 0.2; // for temps/fans — smooth, but without noticeable lag
-let latest = null; // last known-valid frame — same as v1: never show a fake 0
+let latest = null; // last known-valid frame — never show a fake 0
 let frameReady = false; // true exactly once per new telemetry frame (~700ms) — gates the chart history push
 let latestReceivedAt = null;
 let telemetryFetchFailed = false;
