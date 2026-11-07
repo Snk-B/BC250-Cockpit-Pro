@@ -2,13 +2,13 @@
 
 [![Made in Brazil](images/made-in-brazil.svg)](README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-38bdf8.svg?style=flat-square)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-CachyOS%20%7C%20Bazzite%20%7C%20SteamOS-10b981.svg?style=flat-square)](README.md)
+[![Platform](https://img.shields.io/badge/Platform-CachyOS%20Linux-10b981.svg?style=flat-square)](README.md)
 [![APU Architecture](https://img.shields.io/badge/APU-Zen%202%20(8C%2F16T)%20%2B%20RDNA%202%20(40%20CU)-f59e0b.svg?style=flat-square)](README.md)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable%20App-6366f1.svg?style=flat-square)](README.md)
 
 **AMD BC-250 Titanium Studio Cockpit** is an industrial-grade telemetry daemon, animated vector dashboard, native **KDE Plasma 6 Cyber Widgets Suite**, and standalone Progressive Web App (PWA) tailored specifically for the **AMD BC-250** (Sony PS5 *Oberon* / *Cyan Skillfish*, `gfx1013`, PCI ID `1002:13fe`).
 
-Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite**, and **SteamOS**), this suite merges real-time low-level PMBus/VRM telemetry, Nuvoton NCT6687D Super I/O sensors, SMU mailbox memory channels, and Linux hwmon statistics into an ultra-fast, low-overhead monitoring cockpit.
+Engineered specifically for enthusiasts running **CachyOS Linux** (with [MastaG's BC-250 kernels](https://github.com/MastaG/linux-cachyos-bc250)), this suite merges real-time low-level PMBus/VRM telemetry, Nuvoton NCT6687D Super I/O sensors, SMU mailbox memory channels, and Linux hwmon statistics into an ultra-fast, low-overhead monitoring cockpit.
 
 ---
 
@@ -164,7 +164,7 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 | **Memory System** | 16 GB GDDR6 unified across a 256-bit bus (8 physical chips) |
 | **Super I/O Controller** | Nuvoton NCT6687D (manages fan PWM, tachometer, thermal diodes, and voltage sensing) |
 | **Power Inputs** | **Triple 12V Power Inputs** (1x Standard PCIe 8-pin + 2x Auxiliary Molex Micro-Fit 3.0 connectors for high-current overclock stability) |
-| **Supported OS** | CachyOS (all [MastaG BC-250 kernels](https://github.com/MastaG/linux-cachyos-bc250): standard, BORE, sched-ext), Bazzite, SteamOS, Arch Linux |
+| **Supported OS** | CachyOS Linux (all [MastaG BC-250 kernels](https://github.com/MastaG/linux-cachyos-bc250): standard, BORE, sched-ext) | Arch Linux |
 
 ---
 
@@ -174,7 +174,7 @@ For **Cockpit Pro** to capture all hardware sensors (VRM power draw, voltages, f
 
 ### 1. Recommended Kernels & Distributions
 * **CachyOS with [MastaG's BC-250 Kernels](https://github.com/MastaG/linux-cachyos-bc250) (Highly Recommended):** Developer **[MastaG](https://github.com/MastaG/linux-cachyos-bc250)** integrates all Oberon APU fixes, frequency patches, and sensor modules across **all** of his CachyOS BC-250 kernels (standard `linux-cachyos-bc250`, `linux-cachyos-sched-ext-bc250`, etc.). If you are running any of MastaG's BC-250 kernels, all required sensor drivers (`nct6687`, `bc250_vrm 1.1.0+`, and `bc250_memory`) are already built-in and enabled out of the box!
-* **Other Kernels & Distros (Bazzite, SteamOS, Generic Arch, Ubuntu):** You do **not** need to do any physical jumper wire mods! You can simply install or update the sensor drivers via DKMS (see instructions below) to enable full PMBus/VRM access over the existing NCT6687 SMBus entirely in software.
+* **Arch Linux & Other Kernels:** You do **not** need to do any physical jumper wire mods! You can simply install or update the sensor drivers via DKMS (see instructions below) to enable full PMBus/VRM access over the existing NCT6687 SMBus entirely in software.
 
 ### 2. Essential Kernel Modules
 
