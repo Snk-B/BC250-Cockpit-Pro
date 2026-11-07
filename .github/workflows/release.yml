@@ -69,7 +69,6 @@ jobs:
           cp -r web images memory mangohud plasma "dist/$BUNDLE/"
           chmod +x "dist/$BUNDLE/apu_telemetry" "dist/$BUNDLE/install.sh" "dist/$BUNDLE/uninstall.sh"
           tar -C dist -czf BC250-Cockpit-Pro.tar.gz "$BUNDLE"
-          cp BC250-Cockpit-Pro.tar.gz bc250-telemetry.tar.gz
 
       - name: Update GitHub Release
         uses: softprops/action-gh-release@v2
@@ -78,7 +77,6 @@ jobs:
           target_commitish: ${{ github.sha }}
           files: |
             BC250-Cockpit-Pro.tar.gz
-            bc250-telemetry.tar.gz
 
       - name: Upload workflow artifact
         if: always()
