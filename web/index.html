@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="pt-BR">
+<html lang="en">
 
 <head>
 
@@ -102,7 +102,7 @@
 
             <div class="mode-switcher-wrap">
 
-                <div class="mode-switcher" id="dash-mode-switcher" role="tablist" aria-label="Modo de Exibição">
+                <div class="mode-switcher" id="dash-mode-switcher" role="tablist" aria-label="Dashboard Display Mode">
 
                     <button class="mode-btn active" id="btn-mode-basic" data-mode="basic" role="tab" aria-selected="true">
 
@@ -200,9 +200,24 @@
 
                         </div>
 
-                        <div class="mfit-toggle active" id="v2-microfit-toggle" role="button" tabindex="0" title="Toggle Auxiliary 12V Micro-Fit Power Flow" style="-webkit-tap-highlight-color: transparent !important; -webkit-tap-highlight-color: rgba(0,0,0,0) !important; outline: none !important; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; touch-action: manipulation; border-radius: 9999px !important;">
-                            <span class="dot" style="pointer-events: none !important; -webkit-tap-highlight-color: transparent !important;"></span>
-                            <span style="pointer-events: none !important; -webkit-tap-highlight-color: transparent !important; -webkit-user-select: none !important; user-select: none !important;">12V MICRO-FIT</span>
+                        <div class="mfit-toggle-wrapper">
+                            <div class="mfit-toggle" id="v2-microfit-toggle" role="button" tabindex="0" title="Toggle Auxiliary 12V Micro-Fit Power Flow" style="-webkit-tap-highlight-color: transparent !important; -webkit-tap-highlight-color: rgba(0,0,0,0) !important; outline: none !important; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; touch-action: manipulation; border-radius: 9999px !important;">
+                                <span class="dot" style="pointer-events: none !important; -webkit-tap-highlight-color: transparent !important;"></span>
+                                <span style="pointer-events: none !important; -webkit-tap-highlight-color: transparent !important; -webkit-user-select: none !important; user-select: none !important;">12V MICRO-FIT</span>
+                            </div>
+                            <div class="mfit-popover hidden" id="mfit-popover" role="tooltip" aria-hidden="true">
+                                <div class="mfit-popover-arrow"></div>
+                                <div class="mfit-popover-header">
+                                    <span class="mfit-popover-title"><span class="mfit-popover-icon">⚡</span> <span id="mfit-popover-title-text">12V AUXILIARY POWER</span></span>
+                                    <button class="mfit-popover-close" id="mfit-popover-close" aria-label="Close" title="Close">×</button>
+                                </div>
+                                <p class="mfit-popover-text" id="mfit-popover-text">
+                                    Powering via 12V Micro-Fit cable? Click here to toggle auxiliary telemetry and animated current flow on the board.
+                                </p>
+                                <div class="mfit-popover-footer">
+                                    <button class="mfit-popover-btn" id="mfit-popover-dismiss">Got it</button>
+                                </div>
+                            </div>
                         </div>
 
                     </div>

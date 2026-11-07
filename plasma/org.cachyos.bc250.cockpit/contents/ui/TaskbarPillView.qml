@@ -1,23 +1,23 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
 
 Item {
     id: pillRoot
-    implicitWidth: pillLayout.implicitWidth + 24
-    implicitHeight: Math.min(36, parent ? parent.height - 8 : 32)
+
+    // Fixed Dimensions matching the calibrated anti-jitter slot (352 x 32 px)
+    readonly property real fixedPillWidth: 352
+    readonly property real fixedPillHeight: Math.min(36, parent ? parent.height - 8 : 32)
+
+    implicitWidth: fixedPillWidth
+    implicitHeight: fixedPillHeight
+    width: fixedPillWidth
+    height: fixedPillHeight
+
+    Layout.minimumWidth: fixedPillWidth
+    Layout.preferredWidth: fixedPillWidth
+    Layout.maximumWidth: fixedPillWidth
+    Layout.fillWidth: false
     Layout.fillHeight: true
-
-    // Smooth animated values
-    property real displayCpuTemp: root.cpuDieTemp
-    Behavior on displayCpuTemp { NumberAnimation { duration: 400; easing.type: Easing.OutQuad } }
-
-    property real displayGpuTemp: root.gpuDieTemp
-    Behavior on displayGpuTemp { NumberAnimation { duration: 400; easing.type: Easing.OutQuad } }
-
-    property real displayVrmTemp: root.vrmTemp
-    Behavior on displayVrmTemp { NumberAnimation { duration: 400; easing.type: Easing.OutQuad } }
 
     Rectangle {
         id: pillBg
@@ -33,76 +33,169 @@ Item {
 
         RowLayout {
             id: pillLayout
-            anchors.centerIn: parent
-            spacing: 8
+            anchors.fill: parent
+            anchors.leftMargin: 10
+            anchors.rightMargin: 10
+            spacing: 4
 
-            // Glowing Indicator Dot
-            Rectangle {
-                width: 6
-                height: 6
-                radius: 3
-                color: "#00f0a8"
+            // 1. IDENTIDADE (Largura Fixa: 44 px)
+            RowLayout {
+                id: modIdent
+                Layout.preferredWidth: 44
+                Layout.fillWidth: false
                 Layout.alignment: Qt.AlignVCenter
+                spacing: 4
 
-                SequentialAnimation on opacity {
-                    loops: Animation.Infinite
-                    PropertyAnimation { to: 0.4; duration: 900; easing.type: Easing.InOutQuad }
-                    PropertyAnimation { to: 1.0; duration: 900; easing.type: Easing.InOutQuad }
+                Rectangle {
+                    Layout.preferredWidth: 6
+                    Layout.preferredHeight: 6
+                    radius: 3
+                    color: "#00f0a8"
+                    Layout.alignment: Qt.AlignVCenter
+
+                    SequentialAnimation on opacity {
+                        loops: Animation.Infinite
+                        PropertyAnimation { to: 0.4; duration: 900; easing.type: Easing.InOutQuad }
+                        PropertyAnimation { to: 1.0; duration: 900; easing.type: Easing.InOutQuad }
+                    }
+                }
+
+                Text {
+                    text: "BC-250"
+                    color: "#ffffff"
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 9
+                    font.bold: true
+                    Layout.alignment: Qt.AlignVCenter
                 }
             }
 
-            // Board Label
-            Text {
-                text: "BC-250"
-                color: "#ffffff"
-                font.family: "JetBrains Mono"
-                font.pixelSize: 11
-                font.bold: true
+            // Divisor 1
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.preferredHeight: 14
+                color: "#264f43"
                 Layout.alignment: Qt.AlignVCenter
             }
 
-            Rectangle { width: 1; height: 12; color: "#ffffff"; opacity: 0.15; Layout.alignment: Qt.AlignVCenter }
+            // 2. CPU (Largura Fixa: 56 px - Calibrada para até 4 dígitos sem oscilação)
+            ColumnLayout {
+                id: modCpu
+                Layout.preferredWidth: 56
+                Layout.fillWidth: false
+                Layout.alignment: Qt.AlignVCenter
+                spacing: 0
 
-            // CPU Stat
-            Text {
-                text: "<font color='#64748b'>CPU:</font> <font color='#38bdf8'><b>" + pillRoot.displayCpuTemp.toFixed(1) + "Â°C</b></font> <font color='#94a3b8' size='-1'>(" + root.cpuFreqMhz + " MHz)</font>"
-                textFormat: Text.RichText
-                font.family: "JetBrains Mono"
-                font.pixelSize: 11
+                Text {
+                    text: "<font color='#64748b'>CPU</font> <font color='#ffffff'><b>" + Math.round(root.smoothCpuFreqMhz) + "</b></font><font color='#64748b'>MHz</font>"
+                    textFormat: Text.RichText
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 8
+                    Layout.alignment: Qt.AlignLeft
+                }
+                Text {
+                    text: "<font color='#64748b'>TMP</font> <font color='#38bdf8'><b>" + root.smoothCpuDieTemp.toFixed(1) + "\u00B0C</b></font>"
+                    textFormat: Text.RichText
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 8
+                    Layout.alignment: Qt.AlignLeft
+                }
+            }
+
+            // Divisor 2
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.preferredHeight: 14
+                color: "#264f43"
                 Layout.alignment: Qt.AlignVCenter
             }
 
-            Rectangle { width: 1; height: 12; color: "#ffffff"; opacity: 0.15; Layout.alignment: Qt.AlignVCenter }
+            // 3. GPU (Largura Fixa: 56 px - Calibrada para até 4 dígitos sem oscilação)
+            ColumnLayout {
+                id: modGpu
+                Layout.preferredWidth: 56
+                Layout.fillWidth: false
+                Layout.alignment: Qt.AlignVCenter
+                spacing: 0
 
-            // GPU Stat
-            Text {
-                text: "<font color='#64748b'>GPU:</font> <font color='#00f0a8'><b>" + pillRoot.displayGpuTemp.toFixed(1) + "Â°C</b></font> <font color='#94a3b8' size='-1'>(" + root.gpuSclkMhz + " MHz)</font>"
-                textFormat: Text.RichText
-                font.family: "JetBrains Mono"
-                font.pixelSize: 11
+                Text {
+                    text: "<font color='#64748b'>GPU</font> <font color='#ffffff'><b>" + Math.round(root.smoothGpuSclkMhz) + "</b></font><font color='#64748b'>MHz</font>"
+                    textFormat: Text.RichText
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 8
+                    Layout.alignment: Qt.AlignLeft
+                }
+                Text {
+                    text: "<font color='#64748b'>TMP</font> <font color='#00f0a8'><b>" + root.smoothGpuDieTemp.toFixed(1) + "\u00B0C</b></font>"
+                    textFormat: Text.RichText
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 8
+                    Layout.alignment: Qt.AlignLeft
+                }
+            }
+
+            // Divisor 3
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.preferredHeight: 14
+                color: "#264f43"
                 Layout.alignment: Qt.AlignVCenter
             }
 
-            Rectangle { width: 1; height: 12; color: "#ffffff"; opacity: 0.15; Layout.alignment: Qt.AlignVCenter }
+            // 4. VRM + SMU (Largura Fixa: 62 px - Calibrada para 3 dígitos de Watts e Temps)
+            ColumnLayout {
+                id: modVrm
+                Layout.preferredWidth: 62
+                Layout.fillWidth: false
+                Layout.alignment: Qt.AlignVCenter
+                spacing: 0
 
-            // VRM Stat
-            Text {
-                text: "<font color='#64748b'>VRM:</font> <font color='#f59e0b'><b>" + pillRoot.displayVrmTemp.toFixed(1) + "Â°C</b></font>"
-                textFormat: Text.RichText
-                font.family: "JetBrains Mono"
-                font.pixelSize: 11
+                Text {
+                    text: "<font color='#64748b'>VRM</font> <font color='#f59e0b'><b>" + root.smoothVrmTemp.toFixed(1) + "\u00B0C</b></font>"
+                    textFormat: Text.RichText
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 8
+                    Layout.alignment: Qt.AlignLeft
+                }
+                Text {
+                    text: "<font color='#64748b'>SMU</font> <font color='#fde047'><b>" + Math.round(root.smoothTotalPowerW) + "W PWR</b></font>"
+                    textFormat: Text.RichText
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 8
+                    Layout.alignment: Qt.AlignLeft
+                }
+            }
+
+            // Divisor 4
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.preferredHeight: 14
+                color: "#264f43"
                 Layout.alignment: Qt.AlignVCenter
             }
 
-            Rectangle { width: 1; height: 12; color: "#ffffff"; opacity: 0.15; Layout.alignment: Qt.AlignVCenter }
-
-            // Fan Stat
-            Text {
-                text: "<font color='#64748b'>FAN:</font> <font color='#f1f5f9'><b>" + root.fanRpm + " RPM</b></font>"
-                textFormat: Text.RichText
-                font.family: "JetBrains Mono"
-                font.pixelSize: 11
+            // 5. COOLING FAN + PWM (Largura Fixa: 78 px - Calibrada para até 4 dígitos de RPM e '100% ATIVO')
+            ColumnLayout {
+                id: modFan
+                Layout.preferredWidth: 78
+                Layout.fillWidth: false
                 Layout.alignment: Qt.AlignVCenter
+                spacing: 0
+
+                Text {
+                    text: "<font color='#64748b'>FAN</font> <font color='#ffffff'><b>" + Math.round(root.smoothFanRpm) + "</b></font><font color='#64748b'>RPM</font>"
+                    textFormat: Text.RichText
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 8
+                    Layout.alignment: Qt.AlignLeft
+                }
+                Text {
+                    text: "<font color='#64748b'>PWM</font> <font color='#38bdf8'><b>" + Math.round(root.smoothFanPwmPct) + "% " + (root.isPortuguese ? "ATIVO" : "ACTIVE") + "</b></font>"
+                    textFormat: Text.RichText
+                    font.family: "JetBrains Mono"
+                    font.pixelSize: 8
+                    Layout.alignment: Qt.AlignLeft
+                }
             }
         }
     }

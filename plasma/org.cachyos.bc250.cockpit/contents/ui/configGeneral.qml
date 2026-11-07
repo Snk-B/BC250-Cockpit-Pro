@@ -12,16 +12,16 @@ KCM.SimpleKCM {
     Kirigami.FormLayout {
         QQC2.ComboBox {
             id: desktopLayoutCombo
-            Kirigami.FormData.label: "Modo na √Årea de Trabalho:"
+            Kirigami.FormData.label: "Modo na ¡rea de Trabalho:"
             model: [
-                "Desktop HUD Completo (3 C√≠rculos T√©rmicos + Matriz)",
-                "Dock Horizontal Compacta (4 Cards de Telemetria)"
+                "Desktop HUD Completo (Vertical)",
+                "Dock Horizontal Compacto (Horizontal)"
             ]
         }
 
         QQC2.SpinBox {
             id: pollIntervalSpin
-            Kirigami.FormData.label: "Intervalo de Polling (ms):"
+            Kirigami.FormData.label: "Intervalo de AtualizaÁ„o (ms):"
             from: 250
             to: 5000
             stepSize: 100
@@ -29,7 +29,7 @@ KCM.SimpleKCM {
 
         QQC2.TextField {
             id: serverUrlField
-            Kirigami.FormData.label: "Servidor Cockpit Pro:"
+            Kirigami.FormData.label: "Servidor de Telemetria:"
             placeholderText: "http://127.0.0.1:8090"
         }
     }

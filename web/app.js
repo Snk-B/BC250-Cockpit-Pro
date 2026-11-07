@@ -105,8 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setCpuWindow(cpuWindowSecs);
     setGpuWindow(gpuWindowSecs);
 
-        // Basic / Advanced Dashboard Mode Controller & Persistence
-    function setDashboardMode(mode) {
+        // Basic / Advanced Dashboard Mode Controller & Persistence with Smooth Morphing Transition
+    let isTransitioningMode = false;
+    function applyDashboardModeClasses(mode) {
         const isBasic = (mode === 'basic');
         document.body.classList.toggle('mode-basic', isBasic);
         document.body.classList.toggle('mode-advanced', !isBasic);
@@ -130,6 +131,26 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (_) {}
     }
 
+    function setDashboardMode(mode, immediate = false) {
+        const currentMode = document.body.classList.contains('mode-advanced') ? 'advanced' : 'basic';
+        if (immediate || currentMode === mode) {
+            applyDashboardModeClasses(mode);
+            return;
+        }
+
+        if (isTransitioningMode) return;
+        isTransitioningMode = true;
+
+        document.body.classList.add('mode-transitioning');
+        setTimeout(() => {
+            applyDashboardModeClasses(mode);
+            setTimeout(() => {
+                document.body.classList.remove('mode-transitioning');
+                isTransitioningMode = false;
+            }, 260);
+        }, 110);
+    }
+
     let savedDashMode = 'basic';
     try {
         const urlParams = new URLSearchParams(window.location.search);
@@ -139,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             savedDashMode = localStorage.getItem('bc250_dash_mode') || 'basic';
         }
     } catch (_) {}
-    setDashboardMode(savedDashMode);
+    setDashboardMode(savedDashMode, true);
 
     document.getElementById('btn-mode-basic')?.addEventListener('click', () => setDashboardMode('basic'));
     document.getElementById('btn-mode-advanced')?.addEventListener('click', () => setDashboardMode('advanced'));
@@ -157,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('bc250_microfit_power', enabled ? '1' : '0');
         } catch (_) {}
     }
-    let savedMicrofit = true;
+    let savedMicrofit = false; // Default: FALSE (bus-only power by default)
     try {
         const stored = localStorage.getItem('bc250_microfit_power');
         if (stored !== null) savedMicrofit = (stored === '1');
@@ -181,6 +202,66 @@ document.addEventListener('DOMContentLoaded', () => {
             const active = microfitToggle.classList.contains('active') || microfitToggle.classList.contains('is-active');
             setMicrofitState(!active);
         });
+
+    // One-Time Micro-Fit 12V Auxiliary Power Callout Pop-up
+    function initMicrofitPopover() {
+        const popover = document.getElementById('mfit-popover');
+        if (!popover) return;
+
+        let hintSeen = false;
+        try {
+            hintSeen = (localStorage.getItem('bc250_microfit_hint_seen') === '1');
+        } catch (_) {}
+
+        if (hintSeen) return;
+
+        const titleEl = document.getElementById('mfit-popover-title-text');
+        const textEl = document.getElementById('mfit-popover-text');
+        const dismissEl = document.getElementById('mfit-popover-dismiss');
+
+        if (titleEl) titleEl.textContent = '12V AUXILIARY POWER';
+        if (textEl) {
+            textEl.textContent = 'Powering via 12V Micro-Fit cable? Click here to toggle auxiliary telemetry and animated current flow on the board.';
+        }
+        if (dismissEl) dismissEl.textContent = 'Got it';
+
+        const dismissPopover = () => {
+            if (popover.classList.contains('dismissing')) return;
+            popover.classList.add('dismissing');
+            try {
+                localStorage.setItem('bc250_microfit_hint_seen', '1');
+            } catch (_) {}
+            setTimeout(() => {
+                popover.classList.add('hidden');
+                popover.classList.remove('dismissing');
+            }, 250);
+        };
+
+        document.getElementById('mfit-popover-close')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dismissPopover();
+        });
+
+        dismissEl?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dismissPopover();
+        });
+
+        // Also dismiss automatically if the user clicks the toggle itself
+        microfitToggle?.addEventListener('click', () => {
+            dismissPopover();
+        });
+
+        // Show after 1200ms delay on first visit
+        setTimeout(() => {
+            if (!popover.classList.contains('dismissing')) {
+                popover.classList.remove('hidden');
+                popover.setAttribute('aria-hidden', 'false');
+            }
+        }, 1200);
+    }
+    initMicrofitPopover();
+
         microfitToggle.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();

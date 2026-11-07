@@ -3686,3 +3686,192 @@ button:focus-visible,
     border-radius: 9999px !important;
     box-shadow: 0 0 14px rgba(253, 224, 71, 0.5) !important;
 }
+
+
+/* ==========================================================================
+   BASIC <-> ADVANCED SMOOTH MORPHING TRANSITION
+   ========================================================================== */
+.hud-grid {
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.25s ease;
+}
+
+body.mode-transitioning .hud-grid {
+    opacity: 0.55;
+    transform: scale(0.995);
+    filter: blur(0.6px);
+    pointer-events: none;
+}
+
+body.mode-advanced .chart-panel,
+body.mode-advanced .c2-rows-group,
+body.mode-advanced #v2-memory-panel .gddr6-ic-grid,
+body.mode-advanced #v2-memory-panel .subpanel-header,
+body.mode-advanced #v2-memory-clock-row {
+    animation: modeFadeInUp 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+body.mode-basic .basic-essential-strip,
+body.mode-basic .basic-arch-strip,
+body.mode-basic .gddr6-basic-status {
+    animation: modeFadeInDown 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes modeFadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modeFadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.99);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ==========================================================================
+   MICRO-FIT 12V AUXILIARY POPOVER CALLOUT (ONE-TIME HINT)
+   ========================================================================== */
+.mfit-toggle-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.mfit-popover {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 280px;
+    background: rgba(10, 18, 28, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    padding: 12px 14px;
+    z-index: 999;
+    font-family: var(--font-mono);
+    color: #f1f5f9;
+    box-sizing: border-box;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    animation: popoverDropIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mfit-popover.hidden {
+    display: none !important;
+}
+
+.mfit-popover.dismissing {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+    pointer-events: none;
+}
+
+.mfit-popover-arrow {
+    position: absolute;
+    top: -6px;
+    right: 32px;
+    width: 10px;
+    height: 10px;
+    background: #0a121c;
+    border-top: 1px solid rgba(56, 189, 248, 0.4);
+    border-left: 1px solid rgba(56, 189, 248, 0.4);
+    transform: rotate(45deg);
+}
+
+.mfit-popover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mfit-popover-title {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mfit-popover-icon {
+    font-size: 12px;
+    color: #fde047;
+}
+
+.mfit-popover-close {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.mfit-popover-close:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mfit-popover-text {
+    font-size: 11px;
+    line-height: 1.5;
+    color: #94a3b8;
+    margin: 0 0 10px 0;
+    font-weight: 500;
+}
+
+.mfit-popover-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.mfit-popover-btn {
+    background: rgba(0, 240, 168, 0.12);
+    border: 1px solid #00f0a8;
+    color: #00f0a8;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.mfit-popover-btn:hover {
+    background: #00f0a8;
+    color: #05090f;
+    box-shadow: 0 0 12px rgba(0, 240, 168, 0.4);
+}
+
+@keyframes popoverDropIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

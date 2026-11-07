@@ -2,6 +2,7 @@ import http.server
 import socketserver
 import json
 import os
+import sys
 
 import topology
 import overclock
@@ -9,6 +10,13 @@ import telemetry
 
 PORT = int(os.environ.get("BC250_WEB_PORT", 8090))
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
+class BC250Server(http.server.ThreadingHTTPServer):
+    def handle_error(self, request, client_address):
+        err = sys.exc_info()[1]
+        if isinstance(err, (ConnectionResetError, BrokenPipeError, ConnectionAbortedError)):
+            return
+        super().handle_error(request, client_address)
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -31,12 +39,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except ValueError:
             status = 503
             body = json.dumps({'error': 'telemetry contained non-finite values'}).encode()
-        self.send_response(status)
-        self.send_header('Content-type', 'application/json')
-        self.send_header('Content-Length', str(len(body)))
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.send_response(status)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(body)
+        except (ConnectionResetError, BrokenPipeError):
+            pass
 
     def do_GET(self):
         # The daemon owns the complete snapshot, including memory telemetry.
@@ -73,7 +84,7 @@ def main():
     socketserver.TCPServer.allow_reuse_address = True
     # Threaded so a slow endpoint (topology/overclock shell out to systemctl)
     # cannot stall the fast /api/telemetry poll for every other client.
-    with http.server.ThreadingHTTPServer(("", PORT), Handler) as httpd:
+    with BC250Server(("", PORT), Handler) as httpd:
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:

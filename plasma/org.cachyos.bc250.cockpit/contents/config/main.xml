@@ -6,8 +6,12 @@
   <kcfgfile name=""/>
   <group name="General">
     <entry name="desktopLayout" type="Int">
-      <label>Estilo do Widget na Área de Trabalho (0 = HUD Completo, 1 = Dock Compacta)</label>
+      <label>Estilo do Widget na Área de Trabalho (0 = HUD Completo, 1 = Dock Compacto)</label>
       <default>0</default>
+    </entry>
+    <entry name="language" type="String">
+      <label>Idioma da Interface (auto, pt, en)</label>
+      <default>auto</default>
     </entry>
     <entry name="pollInterval" type="Int">
       <label>Intervalo de Atualização (ms)</label>

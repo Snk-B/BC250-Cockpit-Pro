@@ -319,10 +319,35 @@ if [ "$COMPONENT_PLASMA" = 1 ]; then
     sudo cp -r "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" "$PLASMA_DIR"
     sudo chmod -R 755 "$PLASMA_DIR"
 
+    # Setting up official Cyberpunk typography (JetBrains Mono)
+    echo -e "  -> Ensuring Cyberpunk typography (JetBrains Mono) is available..."
+    if command -v pacman >/dev/null 2>&1; then
+        if ! pacman -Q ttf-jetbrains-mono >/dev/null 2>&1; then
+            echo -e "     Installing ttf-jetbrains-mono via pacman..."
+            sudo pacman -S --needed --noconfirm ttf-jetbrains-mono 2>/dev/null || true
+        else
+            echo -e "     ${GREEN}✓${NC} ttf-jetbrains-mono already installed"
+        fi
+    elif command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get install -y fonts-jetbrains-mono 2>/dev/null || true
+    elif command -v dnf >/dev/null 2>&1; then
+        sudo dnf install -y jetbrains-mono-fonts 2>/dev/null || true
+    fi
+
+    # Global font registration fallback: register bundled TTFs into /usr/local/share/fonts
+    if [ -d "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit/contents/ui/fonts" ]; then
+        echo -e "  -> Registering bundled JetBrains Mono TTFs into system fonts directory"
+        sudo mkdir -p /usr/local/share/fonts/jetbrains-mono
+        sudo cp -f "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit/contents/ui/fonts/"*.ttf /usr/local/share/fonts/jetbrains-mono/ 2>/dev/null || true
+        if command -v fc-cache >/dev/null 2>&1; then
+            sudo fc-cache -f /usr/local/share/fonts/jetbrains-mono >/dev/null 2>&1 || true
+        fi
+    fi
+
     # Install official icon into hicolor themes
     echo -e "  -> Installing application icon suite into hicolor theme"
     sudo mkdir -p "/usr/share/icons/hicolor/scalable/apps"
-    [ -f "$SCRIPT_DIR/web/favicon-pulse.svg" ] && sudo cp -f "$SCRIPT_DIR/web/favicon-pulse.svg" "/usr/share/icons/hicolor/scalable/apps/org.cachyos.bc250.cockpit.svg"
+    sudo rm -f "/usr/share/icons/hicolor/scalable/apps/org.cachyos.bc250.cockpit.svg"
     for s in 16 24 32 48 64 128 256 512; do
         sudo mkdir -p "/usr/share/icons/hicolor/${s}x${s}/apps"
         if [ -f "$SCRIPT_DIR/images/app-icon.png" ] && command -v convert >/dev/null 2>&1; then
@@ -336,6 +361,27 @@ if [ "$COMPONENT_PLASMA" = 1 ]; then
     if command -v kpackagetool6 >/dev/null 2>&1; then
         echo -e "  -> Registering plasmoid package via kpackagetool6"
         sudo kpackagetool6 -g -t Plasma/Applet --upgrade "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" 2>/dev/null || sudo kpackagetool6 -g -t Plasma/Applet --install "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" 2>/dev/null || true
+    fi
+    # Also sync user-level plasmoid directory if it exists to avoid stale cache overriding system plasmoid
+    if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
+        USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+        if [ -n "$USER_HOME" ] && [ -d "$USER_HOME/.local/share/plasma/plasmoids" ]; then
+            USER_PLASMA_DIR="$USER_HOME/.local/share/plasma/plasmoids/org.cachyos.bc250.cockpit"
+            if [ -d "$USER_PLASMA_DIR" ]; then
+                echo -e "  -> Synchronizing user plasmoid in $USER_PLASMA_DIR"
+                rm -rf "$USER_PLASMA_DIR"
+                cp -r "$SCRIPT_DIR/plasma/org.cachyos.bc250.cockpit" "$USER_PLASMA_DIR"
+                chown -R "$SUDO_USER":"$SUDO_USER" "$USER_PLASMA_DIR"
+            fi
+        fi
+    fi
+
+    if command -v kbuildsycoca6 >/dev/null 2>&1; then
+        echo -e "  -> Refreshing KDE Plasma 6 applet cache via kbuildsycoca6"
+        kbuildsycoca6 --noincremental 2>/dev/null || true
+        if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
+            sudo -u "$SUDO_USER" kbuildsycoca6 --noincremental 2>/dev/null || true
+        fi
     fi
     echo -e "${GREEN}✓ KDE Plasma 6 widget installed to $PLASMA_DIR!${NC}\n"
 fi

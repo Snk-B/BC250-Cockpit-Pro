@@ -6,7 +6,7 @@
 [![APU Architecture](https://img.shields.io/badge/APU-Zen%202%20(8C%2F16T)%20%2B%20RDNA%202%20(40%20CU)-f59e0b.svg?style=flat-square)](README.md)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable%20App-6366f1.svg?style=flat-square)](README.md)
 
-**AMD BC-250 Titanium Studio Cockpit** is an industrial-grade telemetry daemon, animated vector dashboard, and standalone Progressive Web App (PWA) tailored specifically for the **AMD BC-250** (Sony PS5 *Oberon* / *Cyan Skillfish*, `gfx1013`, PCI ID `1002:13fe`).
+**AMD BC-250 Titanium Studio Cockpit** is an industrial-grade telemetry daemon, animated vector dashboard, native **KDE Plasma 6 Cyber Widgets Suite**, and standalone Progressive Web App (PWA) tailored specifically for the **AMD BC-250** (Sony PS5 *Oberon* / *Cyan Skillfish*, `gfx1013`, PCI ID `1002:13fe`).
 
 Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite**, and **SteamOS**), this suite merges real-time low-level PMBus/VRM telemetry, Nuvoton NCT6687D Super I/O sensors, SMU mailbox memory channels, and Linux hwmon statistics into an ultra-fast, low-overhead monitoring cockpit.
 
@@ -24,7 +24,6 @@ Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite*
 
 ---
 
-
 ### 🐧 KDE Plasma 6 Cyber Widgets Suite (Native CachyOS)
 
 | CachyOS KDE Plasma 6 Widgets Suite |
@@ -33,44 +32,47 @@ Engineered for enthusiasts running Linux gaming systems (**CachyOS**, **Bazzite*
 
 | Concept 1: Desktop HUD | Concept 4: Horizontal Dock | Concept 3: Tray Flyout | Concept 2: Taskbar Pill |
 | :---: | :---: | :---: | :---: |
-| <img src="images/widget_v4_concept1_desktop_hud.jpg" width="210" /> | <img src="images/widget_v4_concept4_horizontal_dock.jpg" width="210" /> | <img src="images/widget_v4_concept3_tray_flyout.jpg" width="210" /> | <img src="images/widget_v4_concept2_taskbar_pill.jpg" width="210" /> |
+| <img src="images/widget_v4_concept1_desktop_hud.jpg" width="210" alt="Concept 1: Desktop HUD" /> | <img src="images/widget_v4_concept4_horizontal_dock.jpg" width="210" alt="Concept 4: Horizontal Dock" /> | <img src="images/widget_v4_concept3_tray_flyout.jpg" width="210" alt="Concept 3: Tray Flyout" /> | <img src="images/widget_v4_concept2_taskbar_pill.jpg" width="210" alt="Concept 2: Taskbar Pill" /> |
 
 ---
 
 ## ⚡ Key Innovations & Features
 
-### 1. 🎛️ Dual-Mode Cockpit (Basic vs. Advanced)
+### 1. 🐧 Native KDE Plasma 6 Cyber Widgets Suite (`org.cachyos.bc250.cockpit`)
+* **All-in-One Smart Plasmoid:** Automatically detects whether it is running directly on the Desktop workspace or docked inside a Panel/Taskbar, seamlessly adapting its presentation mode.
+* **4 Turnkey Layout Concepts:**
+  * **Concept 1 — Desktop HUD Widget:** Dedicated circular hero gauges for CPU Die, GPU Die, and VRAM Hotspot; dynamic live frequency curves; independent CPU & GPU VRM telemetry cards equipped with inset rounded neon accent capsules; and a bottom status bar with **smooth 20 FPS exponential interpolation** on Fan RPM and SMU Power.
+  * **Concept 2 — Taskbar Pill:** Ultra-compact 352x32px status capsule with fixed-width anti-jitter segments showing CPU, GPU, VRM, and Fan speeds with live clock readouts. Clicking the pill opens the Tray Pop-up Flyout.
+  * **Concept 3 — Tray Pop-up Flyout:** Interactive system tray pop-up featuring dynamic cubic Bézier spline waveforms tracking **live CPU & GPU % LOAD** in real time, native vector silicon architecture icon, 8-chip GDDR6 heatmap, board power draw, and a one-click launcher for Cockpit Pro Web.
+  * **Concept 4 — Horizontal Compact Dock:** Multi-tile streamlined horizontal dock with inset colored neon capsules (Blue CPU, Green GPU, Amber VRM, Slate Clocks) and Oberon APU identity badge.
+* **Dynamic Kernel Detection:** Automatically inspects `/proc/version` and renders the active kernel release (e.g. `CACHYOS RC ◆ 7.4.0-rc1`) in the header badge.
+* **Inset Rounded Accent Bars:** Precision-engineered inset accent bars (`width: 3`, `radius: 2`, margins calibrated) across all cards for a unified cyberpunk aesthetic.
+* **100% Native & Hardware-Accelerated:** Written in pure Qt 6 / QML, rendered via Vulkan/OpenGL at monitor refresh rate with near-zero CPU and RAM overhead.
+* **Turnkey Setup:** Bundled directly into `install.sh`, registering the widget automatically for instant use in the KDE Plasma 6 "Add Widgets" menu.
+
+### 2. 🎛️ Dual-Mode Web Cockpit (Basic vs. Advanced)
 * **⚡ Basic Mode (Daily Driving & Gaming):** Clean, non-distracting visual hierarchy displaying primary CPU/GPU temperatures, clocks, fan speed/PWM, VRM power draws, GDDR6 hotspot, and overall board thermals.
 * **🔬 Advanced Mode (Hardware Analytics & Overclocking):** Real-time SVG laser charts (temperature vs. clock curves with 30s/1m/2m windows), per-rail telemetry (Vin, Vout, DrMOS currents, VRM MOSFET phase temperatures), SMU overclock targets, and full individual 8-channel GDDR6 chip thermals.
+* **⚡ 12V Micro-Fit Power Toggle:** Interactive power toggle defaulting to PCIe power only upon fresh install, with an informative one-time guidance popover for users powering auxiliary 12V Micro-Fit connectors.
 * **💾 State Persistence:** Selected cockpit mode is stored locally in the browser (`localStorage`), remembering your preferred view across reboots and devices.
 
-### 2. 📱 Native PWA Standalone Mobile App
+### 3. 📱 Native PWA Standalone Mobile App
 * **Zero Browser Overhead:** Installable directly to the home screen on Android, iOS, Windows, and Linux via Web App Manifest (`manifest.json`) and a dedicated Service Worker (`sw.js`).
 * **Standalone Immersive Mode:** Launches in full screen without browser URL bars, tabs, or navigation chrome, styled with native `#060912` dark titanium status bars.
 * **Custom App Icon Suite:** High-definition handcrafted vector icon representing the *Oberon Silicon Die* with glowing thermal core and micro-traces (available in 16x16, 32x32, 180x180, 192x192, 512x512, and maskable formats).
 
-### 3. 🌀 Live Animated Vector Board Diagram
+### 4. 🌀 Live Animated Vector Board Diagram
 * **Interactive SVG Vector Illustration:** Accurately models the physical AMD BC-250 PCB.
 * **PWM-Driven Cooling Turbine:** The central blower fan animates in real time, synchronizing its rotation speed dynamically with the actual NCT6687D fan RPM and PWM percentage.
 * **Thermal Heat-Glow Gradients:** The APU die and individual GDDR6 ICs dynamically transition from cool cyan to amber and saturated crimson as junction temperatures increase.
 * **Live Power Inflow Animation:** Visual electron flow tracks along the 12V PCIe power rail, dual 12V Micro-Fit connectors, and VRM phases.
 
-### 4. 🧠 8-Channel GDDR6 VRAM Telemetry
+### 5. 🧠 8-Channel GDDR6 VRAM Telemetry
 * **Individual Chip Readouts:** Direct telemetry for all 8 GDDR6 physical memory chips (`#0` through `#7`) via SMU queue 3 mailbox interrogation.
 * **Dynamic Hotspot Highlighting:** Automatically calculates the board average and flags the hottest physical memory chip with an illuminated warning badge and distinct outline.
-* **Mobile-Responsive 2-Column Grid:** Automatically switches from 4 columns to 2 columns on mobile viewports (`<= 600px`), completely eliminating numeric overlap (`#0 52 °C`).
+* **Mobile-Responsive Grid:** Automatically switches layout on mobile viewports (`<= 600px`), completely eliminating numeric overlap.
 
-### 6. 🐧 Native KDE Plasma 6 Cyber Widgets Suite
-* **All-in-One Smart Plasmoid (`org.cachyos.bc250.cockpit`):** Automatically detects whether it is running on the Desktop or in the Taskbar panel, seamlessly adapting its UI representation.
-* **4 Turnkey Layouts:**
-  * **Concept 1 — Desktop HUD Widget:** Dedicated hero dials for CPU Die, GPU Die, and VRAM Hotspot, dynamic live frequency curves, and a 4-engine silicon matrix with glow aesthetics.
-  * **Concept 2 — Taskbar Pill:** Ultra-compact panel status capsule showing CPU, GPU, VRM, and Fan speeds with live clock readouts.
-  * **Concept 3 — Tray Pop-up Flyout:** Interactive system tray menu with stacked CPU/GPU sparklines, 8-chip GDDR6 heatmap, board power draw, and a one-click launcher for Cockpit Pro Web.
-  * **Concept 4 — Horizontal Compact Dock:** Multi-tile horizontal deck for dual frequency and thermal monitoring.
-* **100% Native & Hardware-Accelerated:** Written in pure Qt 6 / QML, rendered via Vulkan/OpenGL at monitor refresh rate with near-zero CPU and RAM overhead.
-* **Turnkey Single-Package Setup:** Bundled directly into `install.sh`, registering the widget automatically for instant use in the KDE Plasma 6 "Add Widgets" menu.
-
-### 5. 🔬 Comprehensive Sensor Fusion & Engine
+### 6. 🔬 Comprehensive Sensor Fusion & Engine
 * **VRM PMBus Sensors:** Reads CPU rail and GPU rail voltages (`vin`, `vout`), currents (`iout`), active power (`pout`), and VRM MOSFET temperatures directly from `bc250_vrm` (NCT6687 SMBus without hardware mods on v1.1.0+) or direct PMBus at `0x60`.
 * **Dynamic Core/Thread Detection:** Intelligently discovers physical cores and logical threads (`8C / 16T` on unlocked dies, `6C / 12T` on salvage units) through `/api/topology`.
 * **Accurate Utilization Metrics:** True CPU load calculated from `/proc/stat` delta times and GPU core busy percent from DRM sysfs.
@@ -119,6 +121,8 @@ flowchart TD
     subgraph Clients["Consumers & Overlays"]
         MOB["Mobile Phone (PWA App)"]
         DESK["Desktop Browser (PC / TV)"]
+        PLAS["KDE Plasma 6 Widgets
+(Desktop HUD, Dock, Pill, Flyout)"]
         MANGO["MangoHud In-Game Overlay"]
         COOL["CoolerControl Fan Daemon"]
     end
@@ -141,6 +145,7 @@ flowchart TD
 
     PWA --> MOB
     HUD --> DESK
+    JSON --> PLAS
     JSON --> MANGO
     JSON --> COOL
 ```
@@ -163,14 +168,12 @@ The **AMD BC-250** is a unique, high-density computing board repurposed from Son
 
 ---
 
----
-
 ## ⚙️ Prerequisites & Kernel Drivers
 
 For **Cockpit Pro** to capture all hardware sensors (VRM power draw, voltages, fan tachometer/PWM, and individual GDDR6 memory chip temperatures), your Linux system needs the appropriate kernel modules:
 
 ### 1. Recommended Kernels & Distributions
-* **CachyOS with [MastaG's BC-250 Kernels](https://github.com/MastaG/linux-cachyos-bc250) (Highly Recommended):** Developer **[MastaG](https://github.com/MastaG/linux-cachyos-bc250)** integrates all Oberon APU fixes, frequency patches, and sensor modules across **all** of his CachyOS BC-250 kernels (not just BORE, but also standard `linux-cachyos-bc250`, `linux-cachyos-sched-ext-bc250`, etc.). If you are running any of MastaG's BC-250 kernels, all required sensor drivers (`nct6687`, `bc250_vrm 1.1.0+`, and `bc250_memory`) are already built-in and enabled out of the box!
+* **CachyOS with [MastaG's BC-250 Kernels](https://github.com/MastaG/linux-cachyos-bc250) (Highly Recommended):** Developer **[MastaG](https://github.com/MastaG/linux-cachyos-bc250)** integrates all Oberon APU fixes, frequency patches, and sensor modules across **all** of his CachyOS BC-250 kernels (standard `linux-cachyos-bc250`, `linux-cachyos-sched-ext-bc250`, etc.). If you are running any of MastaG's BC-250 kernels, all required sensor drivers (`nct6687`, `bc250_vrm 1.1.0+`, and `bc250_memory`) are already built-in and enabled out of the box!
 * **Other Kernels & Distros (Bazzite, SteamOS, Generic Arch, Ubuntu):** You do **not** need to do any physical jumper wire mods! You can simply install or update the sensor drivers via DKMS (see instructions below) to enable full PMBus/VRM access over the existing NCT6687 SMBus entirely in software.
 
 ### 2. Essential Kernel Modules
@@ -186,15 +189,12 @@ For **Cockpit Pro** to capture all hardware sensors (VRM power draw, voltages, f
   * **Telemetry:** CPU & GPU core voltages (`Vout`), supply voltage (`Vin`), DrMOS current (`Iout`), active power draw (`Pout`), and VRM MOSFET phase temperatures.
   * **Zero Hardware Mod Required:** Version `1.1.0` or newer reads the Intersil PMBus controller directly over the NCT6687 SMBus path with **no soldering or jumper wires required**!
   * **Source:** [Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms) (or pre-installed in MastaG's CachyOS BC-250 kernels).
-  * *(Legacy Note: If `bc250_vrm` is not used, the daemon can fall back to direct I2C PMBus reading, which requires the physical jumper wire mod between `I2C_HEADER1` and `TPMS1` detailed in [hardware.md](hardware.md)).*
 
 * **`bc250_memory` (GDDR6 VRAM Telemetry):**
   * **Telemetry:** Individual temperatures for all 8 GDDR6 memory chips and memory hotspot tracking.
   * **Source:** [Hexxeh/bc250-memory-dkms](https://github.com/Hexxeh/bc250-memory-dkms) (or pre-installed in MastaG's CachyOS BC-250 kernels).
 
 #### 🔧 Installing / Updating the Drivers via DKMS (For systems without MastaG's kernel):
-If you are on an OS without pre-installed drivers, run these commands to get sensor access without any hardware mods:
-
 ```bash
 # 1. Install bc250-vrm-dkms (version 1.1.0+ enables jumper-free PMBus reading via NCT6687 SMBus):
 git clone https://github.com/Hexxeh/bc250-vrm-dkms.git
@@ -215,8 +215,6 @@ sudo modprobe nct6687
 ```
 
 ### 3. Verification Commands
-Before launching the installer, you can verify that your sensors are active:
-
 ```bash
 # Check if kernel sensor modules are loaded:
 lsmod | grep -E "nct6687|bc250"
@@ -225,13 +223,13 @@ lsmod | grep -E "nct6687|bc250"
 sensors
 ```
 
-If `sensors` outputs readings from `nct6687`, `bc250_vrm`, or `bc250_memory`, your hardware is 100% ready! The automated installer (`sudo ./install.sh`) will automatically detect your configuration and set up all services.
+---
 
 ## 🚀 Quick Start & Installation
 
-### Option A: Automated One-Line Installation (Recommended)
+### Option A: Standard Interactive Installation (Recommended)
 
-Run the automated installer on your BC-250:
+Run the automated turnkey installer directly on your BC-250:
 
 ```bash
 git clone https://github.com/Snk-B/BC250-Cockpit-Pro.git
@@ -239,34 +237,69 @@ cd BC250-Cockpit-Pro
 sudo ./install.sh
 ```
 
-The installer will:
-1. Detect your Linux distribution (CachyOS, Bazzite, SteamOS).
-2. Install dependencies (g++, make, python3, lm_sensors).
-3. Compile the optimized `apu_telemetry` binary.
-4. Set up and enable systemd background services (`apu_telemetry.service` and `bc250-web.service`).
+The installer will automatically:
+1. Detect your hardware sensors, kernel modules, and Linux distribution.
+2. Compile the high-performance `apu_telemetry` binary.
+3. Install and configure systemd background services (`apu-telemetry.service` and `bc250-web.service`).
+4. Register the **KDE Plasma 6 Cyber Widgets Suite** (`org.cachyos.bc250.cockpit`) into both system and user plasmoids directories, deploy the icon suite, and refresh KDE sycoca.
 5. Launch the Titanium Studio Pro web dashboard on port `8090`.
 
-### Option B: Manual Setup
+---
 
-1. **Compile the Daemon:**
-   ```bash
-   g++ -O3 -std=c++20 bc250_telemetry.cpp -o apu_telemetry
-   sudo cp apu_telemetry /usr/local/bin/
-   ```
+### Option B: Unattended / AI-Agent Automation (Single One-Liner)
 
-2. **Install Systemd Units:**
-   ```bash
-   sudo cp apu-telemetry.service /etc/systemd/system/
-   sudo cp web/bc250-web.service /etc/systemd/system/
-   sudo systemctl daemon-reload
-   sudo systemctl enable --now apu-telemetry.service bc250-web.service
-   ```
+If you are running the setup inside a script, CI runner, or an AI coding assistant (like Antigravity, Cursor, or Claude Code) where no interactive terminal prompt is available:
 
-3. **Access the Dashboard:**
-   Open your browser and navigate to:
-   ```text
-   http://<YOUR_BC250_IP>:8090/
-   ```
+```bash
+git clone https://github.com/Snk-B/BC250-Cockpit-Pro.git && cd BC250-Cockpit-Pro && sudo ./install.sh --dashboard=v2
+```
+
+This single command executes headlessly, configures all services, registers the KDE Plasma widgets, and verifies background health without requiring user interaction.
+
+---
+
+### 🖥️ How to Add the Widgets to KDE Plasma 6
+
+Once `install.sh` finishes:
+
+1. **Add to Desktop (Desktop HUD or Horizontal Dock):**
+   * Right-click anywhere on your empty Desktop workspace.
+   * Click **"Add Widgets..."** (or press `Meta+W`).
+   * Search for **"BC-250 Cockpit Pro"** and drag it onto your desktop.
+   * *To switch between Desktop HUD and Horizontal Dock:* Right-click the widget, select **"Configure BC-250 Cockpit Pro..."**, and choose your preferred layout under *Widget Representation*!
+
+2. **Add to Taskbar / Panel (Taskbar Pill & Tray Flyout):**
+   * Right-click on your bottom KDE Plasma Panel/Taskbar.
+   * Select **"Add Widgets..."**.
+   * Drag **"BC-250 Cockpit Pro"** into the panel (e.g. next to your system tray icons).
+   * It will automatically render as the sleek **Taskbar Pill**!
+   * Click the pill anytime to toggle the **Tray Pop-up Flyout** with dynamic Bézier load waves, memory heatmap, and instant web dashboard access.
+
+---
+
+### 🔍 Verification & Health Check
+
+```bash
+# Verify both daemon and web services are active and running:
+systemctl status apu-telemetry.service bc250-web.service
+
+# Inspect live telemetry stream:
+journalctl -u apu-telemetry -f
+
+# Check JSON sensor bridge:
+curl -s http://localhost:8090/api/telemetry | jq .
+```
+
+---
+
+### 🧹 Clean Uninstallation
+
+To remove all installed files, unit files, and widgets safely:
+
+```bash
+cd BC250-Cockpit-Pro
+sudo ./uninstall.sh
+```
 
 ---
 
@@ -400,7 +433,7 @@ This project builds upon the foundational reverse-engineering and research by th
 * **[MastaG (Dennis Møller)](https://github.com/MastaG/linux-cachyos-bc250)** — Dedicated AMD BC-250 kernel maintenance ([linux-cachyos-bc250](https://github.com/MastaG/linux-cachyos-bc250)), Oberon APU patch integration across all CachyOS BC-250 kernels, and hardware community enablement.
 * **[Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms)** — Pioneering NCT6687 SMBus driver implementation for the BC-250 PMIC and jumper-free VRM telemetry.
 * **[onlinermm/BC250-Telemetry](https://github.com/onlinermm/BC250-Telemetry)** — Original C++ daemon architecture and SMU mailbox reader.
-* **Titanium Studio Pro UI & PWA Edition** — Authored and refined by **Davidson Braga** with full mobile responsiveness, PWA architecture, custom Oberon icon suite, dual-mode cockpit, and dynamic CPU/GPU utilization telemetry.
+* **Titanium Studio Pro UI & PWA Edition** — Authored and refined by **Davidson Braga** with full mobile responsiveness, PWA architecture, custom Oberon icon suite, dual-mode cockpit, native KDE Plasma 6 cyber widgets suite, and dynamic CPU/GPU utilization telemetry.
 
 ---
 
