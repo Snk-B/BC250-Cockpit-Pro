@@ -251,7 +251,7 @@ The installer will automatically:
 If you are running the setup inside a script, CI runner, or an AI coding assistant (like Antigravity, Cursor, or Claude Code) where no interactive terminal prompt is available:
 
 ```bash
-git clone https://github.com/Snk-B/BC250-Cockpit-Pro.git && cd BC250-Cockpit-Pro && sudo ./install.sh --dashboard=v2
+git clone https://github.com/Snk-B/BC250-Cockpit-Pro.git && cd BC250-Cockpit-Pro && sudo ./install.sh
 ```
 
 This single command executes headlessly, configures all services, registers the KDE Plasma widgets, and verifies background health without requiring user interaction.
