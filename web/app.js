@@ -598,16 +598,18 @@ function updateUI() {
     setBar('v2-board-temp-bar', boardBarVal);
     setStatusClass('v2-board-temp-bar', boardBarVal, TEMP_THRESH.board);
 
-    setText('v2-rail-vin', cpuVin.toFixed(2));
-    setBar('v2-rail-vin-bar', cpuVin);
+    const railVinVal = smooth('railVin', cpuVin);
+    setText('v2-rail-vin', railVinVal.toFixed(2));
+    setBar('v2-rail-vin-bar', railVinVal);
 
     // --- CPU CORE ---
     // Core/CU badges are populated separately by fetchTopology() (see
     // bottom of file) — that data comes from a once-per-page-load request,
     // not this per-frame telemetry update.
 
-    setText('v2-cpu-die', cpuDie.toFixed(1));
-    setStatusClass('v2-cpu-die-unit', cpuDie, TEMP_THRESH.die);
+    const cpuDieVal = smooth('cpuDieTxt', cpuDie, SMOOTHING_CRISP);
+    setText('v2-cpu-die', cpuDieVal.toFixed(1));
+    setStatusClass('v2-cpu-die-unit', cpuDieVal, TEMP_THRESH.die);
     const cpuLoad = typeof sw.cpu_usage_pct === 'number' ? sw.cpu_usage_pct : 64;
     setText('v2-cpu-load', Math.round(smooth('cpuLoad', cpuLoad, SMOOTHING_CRISP)).toString());
     const smoothCpuClk = smooth('cpuFreq', cpuFreq);
@@ -668,8 +670,9 @@ function updateUI() {
     setFaultBadge('v2-cpu-temp-fault-badge', cpuTempWarning, cpuTempFault, 'over-temperature (STATUS_TEMPERATURE)');
 
     // --- GPU CORE ---
-    setText('v2-gpu-die', gpuDie.toFixed(1));
-    setStatusClass('v2-gpu-die-unit', gpuDie, TEMP_THRESH.die);
+    const gpuDieVal = smooth('gpuDieTxt', gpuDie, SMOOTHING_CRISP);
+    setText('v2-gpu-die', gpuDieVal.toFixed(1));
+    setStatusClass('v2-gpu-die-unit', gpuDieVal, TEMP_THRESH.die);
     const gpuLoad = typeof sw.gpu_busy_pct === 'number' ? sw.gpu_busy_pct : 98;
     setText('v2-gpu-load', Math.round(smooth('gpuLoad', gpuLoad, SMOOTHING_CRISP)).toString());
     const smoothGpuClk = smooth('gpuClock', gpuClock);

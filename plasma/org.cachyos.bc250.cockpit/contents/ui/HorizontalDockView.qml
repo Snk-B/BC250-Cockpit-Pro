@@ -21,7 +21,9 @@ Item {
 
     Rectangle {
         id: dockBg
-        anchors.fill: parent
+        width: Math.min(Math.max(parent.width, 480), 512)
+        height: 76
+        anchors.centerIn: parent
         color: "#090e17"
         radius: 14
         border.color: "#163640"

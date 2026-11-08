@@ -1,6 +1,18 @@
 // GDDR6 temperatures are discrete samples: display them without interpolation.
 // Physical positions follow the board owner's top/X-ray view mapping.
 const BC250Memory = (() => {
+    const memState = {};
+    function smoothMem(key, targetValue, factor = 0.2) {
+        if (typeof targetValue !== 'number' || !Number.isFinite(targetValue)) return targetValue;
+        if (memState[key] === undefined) {
+            memState[key] = targetValue;
+        } else {
+            const diff = targetValue - memState[key];
+            memState[key] = Math.abs(diff) < 0.05 ? targetValue : memState[key] + diff * factor;
+        }
+        return memState[key];
+    }
+
     const MAX_AGE_MS = 15000;
     const DESIGNATORS = ['U27', 'U29', 'U31', 'U33', 'U43', 'U41', 'U39', 'U37'];
 
