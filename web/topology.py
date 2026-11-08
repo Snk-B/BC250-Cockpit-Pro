@@ -1,38 +1,39 @@
-"""CPU/GPU core-count detection for the BC-250.
+"""CPU/GPU core-count, clock limits, and hardware topology detection for the BC-250.
 
 Split out of the telemetry daemon on purpose: unlike temperature/clock/power,
-this is topology info that only changes when someone actively unlocks more
-cores/CUs (a reboot for CPU cores, or a live WGP toggle for GPU CUs) — it
-doesn't need the daemon's 700ms polling cadence, and living here means
-checking it doesn't require rebuilding and reinstalling the C++ binary.
+this is topology and target config info that only changes when someone actively
+unlocks more cores/CUs (a reboot for CPU cores, or a live WGP toggle for GPU CUs)
+or changes overclock/governor targets ? it doesn't need the daemon's 700ms polling
+cadence, and living here means checking it doesn't require rebuilding and reinstalling
+the C++ binary.
 """
 
+import configparser
 import ctypes
 import os
 import platform
 import re
 import subprocess
 
-# AMDGPU_INFO_DEV_INFO — same query bc250-toolkit and bc250-cu-live-manager
+try:
+    import tomllib
+except ImportError:
+    tomllib = None
+
+# AMDGPU_INFO_DEV_INFO ? same query bc250-toolkit and bc250-cu-live-manager
 # use (via the same libdrm_amdgpu.so.1 call), fills a struct
 # drm_amdgpu_info_device. cu_active_number sits at byte offset 48 in that
-# struct — cross-checked against bc250-cu-live-manager, which reads the
+# struct ? cross-checked against bc250-cu-live-manager, which reads the
 # cu_bitmap array starting right after it, at offset 56.
 _AMDGPU_INFO_DEV_INFO = 0x16
 _CU_ACTIVE_NUMBER_OFFSET = 48
 _QUERY_BUF_SIZE = 256
 
-# bc250-cu-live-manager toggles CU dispatch by writing SPI/CC/RLC registers
-# live, via umr, *after* the amdgpu driver has already initialized and
-# cached cu_active_number — so it never sees that live change. Its own
-# status view doesn't trust the ioctl either; it re-reads the live SPI
-# register through umr. umr flatly refuses to run without root though, and
-# this (unprivileged) web service has no business asking for that — so
-# instead this falls back to the boot profile bc250-cu-live-manager itself
-# saved, which is world-readable. Best-effort: correct as long as nobody
-# live-toggled WGPs since without re-running `write-service-table`.
 _CU_LIVE_MANAGER_CONF = '/etc/bc250-cu-live-manager.conf'
 _CU_LIVE_MANAGER_SERVICE = 'bc250-cu-live-manager.service'
+
+CPU_OC_CONF = '/etc/bc250-smu-oc.conf'
+GPU_GOV_CONF = '/etc/cyan-skillfish-governor-smu/config.toml'
 
 
 def _service_active(name):
@@ -47,7 +48,7 @@ def _service_active(name):
 
 
 def _read_cu_live_manager_masks():
-    """BC250_WGP_MASKS=SE0.SH0,SE0.SH1,SE1.SH0,SE1.SH1 — each a 5-bit WGP
+    """BC250_WGP_MASKS=SE0.SH0,SE0.SH1,SE1.SH0,SE1.SH1 ? each a 5-bit WGP
     dispatch mask (bit per WGP, 2 CU per WGP), same encoding
     bc250-cu-live-manager itself uses for its "CUs active & routed" total."""
     try:
@@ -68,17 +69,29 @@ def _read_cu_live_manager_masks():
 
 
 def read_cpu_physical_cores():
-    """Physical core count, straight from cpuinfo's own "cpu cores" field —
+    """Physical core count, straight from cpuinfo's own "cpu cores" field ?
     not threads/2, since a core disabled by binning isn't guaranteed to
-    leave exactly half the threads intact."""
+    leave exactly half the threads intact. Stock BC-250 boards are 6 cores;
+    unlocked boards are 8 cores."""
+    core_ids = set()
+    cpu_cores_val = None
     try:
         with open('/proc/cpuinfo') as f:
             for line in f:
-                if line.startswith('cpu cores'):
-                    return int(line.split(':', 1)[1].strip())
+                if line.startswith('cpu cores') and cpu_cores_val is None:
+                    cpu_cores_val = int(line.split(':', 1)[1].strip())
+                elif line.startswith('core id'):
+                    core_ids.add(line.split(':', 1)[1].strip())
+        if cpu_cores_val and cpu_cores_val > 0:
+            return cpu_cores_val
+        if core_ids:
+            return len(core_ids)
     except (OSError, ValueError):
         pass
-    return None
+    threads = read_cpu_threads()
+    if threads:
+        return 8 if threads >= 16 else 6
+    return 8
 
 
 def _open_render_node():
@@ -96,7 +109,7 @@ def _open_render_node():
 
 def _read_driver_cu_active():
     """Active Compute Unit count per the amdgpu kernel driver's own cached
-    topology — correct for a boot-time unlock (e.g. a kernel patch clearing
+    topology ? correct for a boot-time unlock (e.g. a kernel patch clearing
     the harvest mask before CU enumeration runs), but stale for anything
     that changes dispatch registers live, after the driver already cached
     this number."""
@@ -130,27 +143,133 @@ def _read_driver_cu_active():
 
 
 def read_gpu_cu_active():
+    """Active Compute Units for Oberon RDNA2. Factory standard baseline is 24 CUs,
+    with unlock tiers at 32, 34, 36, 38, and 40 CUs."""
     if _service_active(_CU_LIVE_MANAGER_SERVICE):
         live_manager_count = _read_cu_live_manager_masks()
         if live_manager_count:
             return live_manager_count
-    return _read_driver_cu_active()
+    driver_cu = _read_driver_cu_active()
+    if driver_cu and driver_cu > 0:
+        return driver_cu
+    return 24
 
 
 def read_cpu_threads():
+    """Total logical threads from /proc/cpuinfo (12 on stock 6c, 16 on 8c)."""
     try:
         with open('/proc/cpuinfo') as f:
-            return sum(1 for line in f if line.startswith('processor'))
+            count = sum(1 for line in f if line.startswith('processor'))
+            if count > 0:
+                return count
     except (OSError, ValueError):
         pass
-    return os.cpu_count() or None
+    return os.cpu_count() or 16
+
+
+def read_cpu_max_mhz(cpu_cores=None):
+    """Dynamic CPU frequency target in MHz.
+    1. Checks /etc/bc250-smu-oc.conf (target_freq_mhz)
+    2. Checks Linux cpufreq scaling_max_freq / cpuinfo_max_freq
+    3. Falls back to stock 3200 MHz (or 3500 MHz for 8-core profiles)."""
+    parser = configparser.ConfigParser()
+    try:
+        if parser.read(CPU_OC_CONF):
+            freq = parser.getint('overclock', 'frequency', fallback=None)
+            if freq and freq > 0:
+                return freq
+    except (OSError, configparser.Error, ValueError):
+        pass
+
+    for p in ('/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq',
+              '/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq'):
+        try:
+            with open(p) as f:
+                khz = int(f.read().strip())
+                if khz > 0:
+                    return round(khz / 1000)
+        except (OSError, ValueError):
+            pass
+
+    return 3500 if (cpu_cores and cpu_cores >= 8) else 3200
+
+
+def read_cpu_max_temp_c():
+    """Dynamic thermal ceiling in ?C from SMU OC config (fallback 80?C)."""
+    parser = configparser.ConfigParser()
+    try:
+        if parser.read(CPU_OC_CONF):
+            temp = parser.getint('overclock', 'max_temperature', fallback=None)
+            if temp and temp > 0:
+                return temp
+    except (OSError, configparser.Error, ValueError):
+        pass
+    return 80
+
+
+def read_gpu_target_freq_mhz():
+    """Dynamic GPU frequency range (max_mhz, min_mhz).
+    Reads /etc/cyan-skillfish-governor-smu/config.toml, falls back to (1850, 500)."""
+    max_freq = None
+    min_freq = None
+    if tomllib is not None:
+        try:
+            with open(GPU_GOV_CONF, 'rb') as f:
+                data = tomllib.load(f)
+            freq_range = data.get('frequency-range', {})
+            max_freq = freq_range.get('max') or None
+            min_freq = freq_range.get('min') or None
+        except (OSError, tomllib.TOMLDecodeError):
+            pass
+    if max_freq is None or min_freq is None:
+        try:
+            with open(GPU_GOV_CONF, 'r', encoding='utf-8') as f:
+                content = f.read()
+            m_max = re.search(r'max\s*=\s*(\d+)', content)
+            m_min = re.search(r'min\s*=\s*(\d+)', content)
+            if m_max: max_freq = int(m_max.group(1))
+            if m_min: min_freq = int(m_min.group(1))
+        except (OSError, ValueError):
+            pass
+    return (max_freq or 1850, min_freq or 500)
+
+
+def read_memory_total_gb():
+    """Dynamic memory capacity in GB. Stock BC-250 has 16GB GDDR6 unified across 8 chips."""
+    try:
+        with open('/proc/meminfo') as f:
+            for line in f:
+                if line.startswith('MemTotal:'):
+                    kb = int(line.split(':', 1)[1].strip().split()[0])
+                    gib = kb / (1024 * 1024)
+                    if 12 <= gib <= 17:
+                        return 16
+                    return round(gib)
+    except (OSError, ValueError):
+        pass
+    return 16
 
 
 def read_topology():
+    cpu_cores = read_cpu_physical_cores()
+    cpu_threads = read_cpu_threads()
+    gpu_cu = read_gpu_cu_active()
+    gpu_shaders = (gpu_cu * 64) if gpu_cu else 2560
+    cpu_max_mhz = read_cpu_max_mhz(cpu_cores)
+    cpu_max_temp = read_cpu_max_temp_c()
+    gpu_max_mhz, gpu_min_mhz = read_gpu_target_freq_mhz()
+    memory_gb = read_memory_total_gb()
+
     return {
-        'cpu_physical_cores': read_cpu_physical_cores(),
-        'cpu_logical_cores': read_cpu_threads(),
-        'gpu_cu_active': read_gpu_cu_active(),
+        'cpu_physical_cores': cpu_cores,
+        'cpu_logical_cores': cpu_threads,
+        'cpu_max_mhz': cpu_max_mhz,
+        'cpu_max_temp_c': cpu_max_temp,
+        'gpu_cu_active': gpu_cu,
+        'gpu_shaders': gpu_shaders,
+        'gpu_max_mhz': gpu_max_mhz,
+        'gpu_min_mhz': gpu_min_mhz,
+        'memory_total_gb': memory_gb,
         'kernel_release': platform.release(),
     }
 

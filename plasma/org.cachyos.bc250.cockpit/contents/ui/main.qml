@@ -80,7 +80,12 @@ PlasmoidItem {
         root.height = isHorizontalDock ? 76 : 420;
     }
 
-    // Hardware Topology (Dynamic CUs and Shaders)
+    // Hardware Topology (Dynamic CPU Cores/Threads, GPU CUs/Shaders & Memory)
+    property int cpuCores: 8
+    property int cpuThreads: 16
+    readonly property string cpuTopologyString: cpuCores + "c / " + cpuThreads + "t"
+    property int cpuMaxTempC: 80
+    property int memoryTotalGb: 16
     property int gpuCuActive: 40
     property int gpuShaders: gpuCuActive * 64
 
@@ -431,10 +436,13 @@ PlasmoidItem {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 try {
                     var data = JSON.parse(xhr.responseText);
-                    if (data.cpu && typeof data.cpu.target_freq_mhz === "number") {
+                    if (data.cpu && typeof data.cpu.target_freq_mhz === "number" && data.cpu.target_freq_mhz > 0) {
                         root.cpuTargetFreqMhz = data.cpu.target_freq_mhz;
                     }
-                    if (data.gpu && typeof data.gpu.max_freq_mhz === "number") {
+                    if (data.cpu && typeof data.cpu.max_temp_c === "number" && data.cpu.max_temp_c > 0) {
+                        root.cpuMaxTempC = data.cpu.max_temp_c;
+                    }
+                    if (data.gpu && typeof data.gpu.max_freq_mhz === "number" && data.gpu.max_freq_mhz > 0) {
                         root.gpuMaxFreqMhz = data.gpu.max_freq_mhz;
                     }
                 } catch (e) {}
@@ -455,8 +463,28 @@ PlasmoidItem {
                     if (data.kernel_release) {
                         root.kernelRelease = data.kernel_release;
                     }
+                    if (typeof data.cpu_physical_cores === "number" && data.cpu_physical_cores > 0) {
+                        root.cpuCores = data.cpu_physical_cores;
+                    }
+                    if (typeof data.cpu_logical_cores === "number" && data.cpu_logical_cores > 0) {
+                        root.cpuThreads = data.cpu_logical_cores;
+                    }
                     if (typeof data.gpu_cu_active === "number" && data.gpu_cu_active > 0) {
                         root.gpuCuActive = data.gpu_cu_active;
+                    }
+                    if (typeof data.cpu_max_mhz === "number" && data.cpu_max_mhz > 0) {
+                        root.cpuTargetFreqMhz = data.cpu_max_mhz;
+                    }
+                    if (typeof data.cpu_max_temp_c === "number" && data.cpu_max_temp_c > 0) {
+                        root.cpuMaxTempC = data.cpu_max_temp_c;
+                    }
+                    if (typeof data.gpu_max_freq_mhz === "number" && data.gpu_max_freq_mhz > 0) {
+                        root.gpuMaxFreqMhz = data.gpu_max_freq_mhz;
+                    } else if (typeof data.gpu_max_mhz === "number" && data.gpu_max_mhz > 0) {
+                        root.gpuMaxFreqMhz = data.gpu_max_mhz;
+                    }
+                    if (typeof data.memory_total_gb === "number" && data.memory_total_gb > 0) {
+                        root.memoryTotalGb = data.memory_total_gb;
                     }
                 } catch (e) {}
             }

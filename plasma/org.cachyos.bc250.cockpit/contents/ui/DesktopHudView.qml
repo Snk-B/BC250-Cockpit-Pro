@@ -251,7 +251,7 @@ Item {
                     strokeColor: "#38bdf8"
                     centerSub: "CPU DIE"
                     title: "CPU ZEN 2"
-                    subinfo: "8c / 16t \u00B7 80\u00B0C"
+                    subinfo: root.cpuCores + "c / " + root.cpuThreads + "t \u00B7 " + root.cpuMaxTempC + "\u00B0C"
                 }
 
                 Rectangle {
@@ -268,7 +268,7 @@ Item {
                     strokeColor: "#00f0a8"
                     centerSub: "GPU DIE"
                     title: "GPU RDNA2"
-                    subinfo: root.gpuCuActive + " CUs \u00B7 " + (root.gpuCuActive * 64) + " SH"
+                    subinfo: root.gpuCuActive + " CUs \u00B7 " + root.gpuShaders + " SH"
                 }
 
                 Rectangle {
@@ -285,7 +285,7 @@ Item {
                     strokeColor: "#f59e0b"
                     centerSub: "HOTSPOT"
                     title: "VRAM HOTSPOT"
-                    subinfo: "Chip #" + root.vramHotspotChip + " \u00B7 16GB"
+                    subinfo: "Chip #" + root.vramHotspotChip + " \u00B7 " + root.memoryTotalGb + "GB"
                 }
             }
 

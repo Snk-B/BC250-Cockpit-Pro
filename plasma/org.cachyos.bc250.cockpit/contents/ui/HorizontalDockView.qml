@@ -37,7 +37,7 @@ Item {
             spacing: 6
 
             // -------------------------------------------------------------
-            // Brand Identity Module (OBERON APU · 40 CUs)
+            // Brand Identity Module (OBERON APU Â· 40 CUs)
             // -------------------------------------------------------------
             ColumnLayout {
                 Layout.preferredWidth: 78
@@ -106,7 +106,7 @@ Item {
             }
 
             // -------------------------------------------------------------
-            // 4 Telemetry Tiles Grid (Pílulas Arredondadas + Números Brancos)
+            // 4 Telemetry Tiles Grid (PÃ­lulas Arredondadas + NÃºmeros Brancos)
             // -------------------------------------------------------------
             RowLayout {
                 Layout.fillWidth: true
@@ -122,7 +122,7 @@ Item {
                     border.color: "#163447"
                     border.width: 1
 
-                    // Left Cyan Neon Accent: Pílula arredondada interna que orna perfeitamente com a borda
+                    // Left Cyan Neon Accent: PÃ­lula arredondada interna que orna perfeitamente com a borda
                     Rectangle {
                         width: 3
                         radius: 2
@@ -158,7 +158,7 @@ Item {
                             font.bold: true
                         }
                         Text {
-                            text: root.isPortuguese ? ("8c/16t \u00B7 " + root.smoothCpuUsagePct.toFixed(0) + "% Carga") : ("8c/16t \u00B7 " + root.smoothCpuUsagePct.toFixed(0) + "% Load")
+                            text: root.isPortuguese ? (root.cpuCores + "c/" + root.cpuThreads + "t \u00B7 " + root.smoothCpuUsagePct.toFixed(0) + "% Carga") : (root.cpuCores + "c/" + root.cpuThreads + "t \u00B7 " + root.smoothCpuUsagePct.toFixed(0) + "% Load")
                             color: "#94a3b8"
                             font.family: "JetBrains Mono"
                             font.pixelSize: 7
@@ -175,7 +175,7 @@ Item {
                     border.color: "#102f23"
                     border.width: 1
 
-                    // Left Emerald Neon Accent: Pílula arredondada interna
+                    // Left Emerald Neon Accent: PÃ­lula arredondada interna
                     Rectangle {
                         width: 3
                         radius: 2
@@ -228,7 +228,7 @@ Item {
                     border.color: "#382512"
                     border.width: 1
 
-                    // Left Amber Neon Accent: Pílula arredondada interna
+                    // Left Amber Neon Accent: PÃ­lula arredondada interna
                     Rectangle {
                         width: 3
                         radius: 2
@@ -281,7 +281,7 @@ Item {
                     border.color: "#182430"
                     border.width: 1
 
-                    // Left Slate Accent: Pílula arredondada interna
+                    // Left Slate Accent: PÃ­lula arredondada interna
                     Rectangle {
                         width: 3
                         radius: 2

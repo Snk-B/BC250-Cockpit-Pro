@@ -145,7 +145,7 @@ Item {
                     RowLayout {
                         Layout.fillWidth: true
                         Text {
-                            text: "CPU Zen 2 (8c / 16t)"
+                            text: "CPU Zen 2 (" + root.cpuCores + "c / " + root.cpuThreads + "t)"
                             color: "#e2e8f0"
                             font.family: "Plus Jakarta Sans"
                             font.pixelSize: 11

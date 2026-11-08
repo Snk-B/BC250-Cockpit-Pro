@@ -782,6 +782,11 @@ async function fetchTopology() {
             setText('v2-cpu-cores', String(cores));
             setText('v2-cpu-threads', String(threads));
             setCoreBadgeClass('v2-cpu-cores-badge', topo.cpu_physical_cores, 6, 8);
+
+            const dieCpu = document.getElementById('svg-die-cpu-topo');
+            if (dieCpu) {
+                dieCpu.textContent = `${cores}C / ${threads}T ZEN 2`;
+            }
         }
 
         const hasCuCount = typeof topo.gpu_cu_active === 'number' && topo.gpu_cu_active > 0;
@@ -789,6 +794,32 @@ async function fetchTopology() {
         if (hasCuCount) {
             setText('v2-gpu-cus', String(topo.gpu_cu_active));
             setCoreBadgeClass('v2-gpu-cus-badge', topo.gpu_cu_active, 24, 40);
+
+            const dieGpu = document.getElementById('svg-die-gpu-cus');
+            if (dieGpu) {
+                dieGpu.textContent = `CUSTOM APU · ${topo.gpu_cu_active} CUs`;
+            }
+        }
+
+        if (typeof topo.memory_total_gb === 'number' && topo.memory_total_gb > 0) {
+            const memText = document.getElementById('svg-die-mem-desc');
+            if (memText) {
+                memText.textContent = `AMD "OBERON" FLCL CUSTOM APU · ${topo.memory_total_gb}GB GDDR6 256-BIT`;
+            }
+        }
+
+        // Dynamic basic clock limits when overclock service isn't active
+        if (typeof topo.cpu_max_mhz === 'number') {
+            const basicCpu = document.getElementById('v2-cpu-basic-oc');
+            if (basicCpu && !basicCpu.dataset.customSet) {
+                basicCpu.textContent = `${topo.cpu_max_mhz} MHz`;
+            }
+        }
+        if (typeof topo.gpu_max_mhz === 'number') {
+            const basicGpu = document.getElementById('v2-gpu-basic-maxfreq');
+            if (basicGpu && !basicGpu.dataset.customSet) {
+                basicGpu.textContent = `${topo.gpu_max_mhz} MHz`;
+            }
         }
     } catch (error) {
         console.error('Failed to fetch topology:', error);
@@ -817,9 +848,13 @@ async function fetchOverclock() {
         const response = await fetch('/api/overclock');
         const oc = await response.json();
 
+        const cpuBasic = document.getElementById('v2-cpu-basic-oc');
+        if (oc.cpu?.target_freq_mhz) {
+            if (cpuBasic) cpuBasic.dataset.customSet = 'true';
+        }
         setOcPanel('v2-cpu-oc-panel', 'v2-cpu-oc-dot', oc.cpu?.active, oc.cpu?.config_present, [
             ['v2-cpu-oc-freq-val', oc.cpu?.target_freq_mhz],
-            ['v2-cpu-basic-oc', oc.cpu?.target_freq_mhz ? (oc.cpu.target_freq_mhz + ' MHz') : '3800 MHz'],
+            ['v2-cpu-basic-oc', oc.cpu?.target_freq_mhz ? (oc.cpu.target_freq_mhz + ' MHz') : (cpuBasic ? cpuBasic.textContent : '3200 MHz')],
             ['v2-cpu-oc-maxtemp', oc.cpu?.max_temp_c],
         ]);
         const cpuTargetEl = document.getElementById('v2-cpu-oc-target-val');
@@ -827,9 +862,13 @@ async function fetchOverclock() {
             cpuTargetEl.classList.add('oc-val-highlight');
         }
 
+        const gpuBasic = document.getElementById('v2-gpu-basic-maxfreq');
+        if (oc.gpu?.max_freq_mhz) {
+            if (gpuBasic) gpuBasic.dataset.customSet = 'true';
+        }
         setOcPanel('v2-gpu-oc-panel', 'v2-gpu-oc-dot', oc.gpu?.active, oc.gpu?.config_present, [
             ['v2-gpu-oc-maxfreq', oc.gpu?.max_freq_mhz],
-            ['v2-gpu-basic-maxfreq', oc.gpu?.max_freq_mhz ? (oc.gpu.max_freq_mhz + ' MHz') : '1900 MHz'],
+            ['v2-gpu-basic-maxfreq', oc.gpu?.max_freq_mhz ? (oc.gpu.max_freq_mhz + ' MHz') : (gpuBasic ? gpuBasic.textContent : '1850 MHz')],
             ['v2-gpu-oc-minfreq', oc.gpu?.min_freq_mhz],
         ]);
         const gpuMaxEl = document.getElementById('v2-gpu-oc-max-val');
