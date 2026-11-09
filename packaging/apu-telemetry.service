@@ -1,0 +1,12 @@
+[Unit]
+Description=AMD BC-250 APU Telemetry Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/apu_telemetry
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

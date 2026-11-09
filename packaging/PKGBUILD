@@ -1,0 +1,67 @@
+# Maintainer: Davidson Braga <davidson@cachyos.org>
+# Contributor: Antigravity AI
+pkgname=bc250-cockpit-pro
+pkgver=1.1.1
+pkgrel=1
+pkgdesc="AMD BC-250 Oberon APU Live Hardware, Power & Thermal Telemetry Suite for CachyOS"
+arch=('x86_64')
+url="https://github.com/Snk-B/BC250-Cockpit-Pro"
+license=('MIT')
+depends=(
+    'gcc-libs'
+    'glibc'
+    'python'
+    'systemd'
+    'qt6-declarative'
+    'kirigami'
+    'plasma-workspace'
+)
+optdepends=(
+    'bc250-vrm-dkms: PMBus VRM voltage, current and power sensors without hardware mod'
+    'nct6687-dkms-git: Super I/O thermals and auxiliary sensors'
+    'cyan-skillfish-governor-smu: Dynamic SMU GPU overclock governor'
+)
+makedepends=('gcc' 'git')
+backup=('etc/bc250-telemetry.conf')
+install="${pkgname}.install"
+source=(
+    "${pkgname}-${pkgver}.tar.gz::https://github.com/Snk-B/BC250-Cockpit-Pro/archive/refs/tags/v${pkgver}.tar.gz"
+    "apu-telemetry.service"
+    "bc250-web.service"
+)
+sha256sums=(
+    'SKIP'
+    'SKIP'
+    'SKIP'
+)
+
+build() {
+    cd "BC250-Cockpit-Pro-${pkgver}"
+    g++ bc250_telemetry.cpp -O3 -Wall -Wextra -std=c++17 -o apu_telemetry
+}
+
+package() {
+    cd "BC250-Cockpit-Pro-${pkgver}"
+
+    # 1. Binary executable
+    install -Dm755 apu_telemetry "${pkgdir}/usr/bin/apu_telemetry"
+
+    # 2. Configuration file
+    install -Dm644 config/bc250-telemetry.conf "${pkgdir}/etc/bc250-telemetry.conf"
+
+    # 3. Systemd Services
+    install -Dm644 "${srcdir}/apu-telemetry.service" "${pkgdir}/usr/lib/systemd/system/apu-telemetry.service"
+    install -Dm644 "${srcdir}/bc250-web.service" "${pkgdir}/usr/lib/systemd/system/bc250-web.service"
+
+    # 4. Web Dashboard & PWA Assets
+    install -d "${pkgdir}/usr/share/bc250-cockpit-pro/web"
+    cp -r web/* "${pkgdir}/usr/share/bc250-cockpit-pro/web/"
+
+    # 5. Native KDE Plasma 6 Cyber Widgets Suite
+    install -d "${pkgdir}/usr/share/plasma/plasmoids/org.cachyos.bc250.cockpit"
+    cp -r plasma/org.cachyos.bc250.cockpit/* "${pkgdir}/usr/share/plasma/plasmoids/org.cachyos.bc250.cockpit/"
+
+    # 6. Documentation and License
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+}
