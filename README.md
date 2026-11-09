@@ -232,16 +232,11 @@ sensors
 The fastest and cleanest way to install and keep **BC-250 Cockpit Pro** updated automatically with your system:
 
 ```bash
-# 1. Add the official BC-250 repository to /etc/pacman.conf:
-sudo tee -a /etc/pacman.conf << 'EOF'
-
-[bc250-cockpit]
-SigLevel = Optional TrustAll
-Server = https://snk-b.github.io/bc250-packages/$arch
-EOF
+# 1. Add the official BC-250 repository to /etc/pacman.conf (Works on Fish, Bash & Zsh):
+printf "\n[bc250-cockpit]\nSigLevel = Optional TrustAll\nServer = https://snk-b.github.io/bc250-packages/\$arch\n" | sudo tee -a /etc/pacman.conf
 
 # 2. Synchronize databases and install:
-sudo pacman -Sy bc250-cockpit-pro
+sudo pacman -Sy --overwrite "*" bc250-cockpit-pro
 ```
 
 *Every time you run `sudo pacman -Syu` or update CachyOS, BC-250 Cockpit Pro will update seamlessly in the background!*

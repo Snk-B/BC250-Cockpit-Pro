@@ -19,17 +19,22 @@ echo "======================================================================"
 mkdir -p "${TARGET_DIR}"
 
 cd "${SCRIPT_DIR}"
+echo ":: Cleaning old build artifacts..."
+rm -rf src/ pkg/ *.pkg.tar.zst
+
 echo ":: Building package with makepkg..."
 makepkg -sf --noconfirm
 
 echo ":: Moving built package to ${TARGET_DIR}..."
+rm -f "${TARGET_DIR}"/*.pkg.tar.zst
 mv bc250-cockpit-pro-*.pkg.tar.zst "${TARGET_DIR}/"
 
 cd "${TARGET_DIR}"
 PKG_FILE=$(ls -t bc250-cockpit-pro-*.pkg.tar.zst | head -n 1)
 
 echo ":: Generating pacman repository database (bc250-cockpit.db.tar.gz)..."
-repo-add -s -n -R "bc250-cockpit.db.tar.gz" "${PKG_FILE}" || repo-add "bc250-cockpit.db.tar.gz" "${PKG_FILE}"
+rm -f bc250-cockpit.db* bc250-cockpit.files*
+repo-add "bc250-cockpit.db.tar.gz" "${PKG_FILE}"
 
 # Symlinks for pacman standard discovery
 ln -sf bc250-cockpit.db.tar.gz bc250-cockpit.db

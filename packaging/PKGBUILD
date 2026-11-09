@@ -2,7 +2,7 @@
 # Contributor: Antigravity AI
 pkgname=bc250-cockpit-pro
 pkgver=1.1.1
-pkgrel=1
+pkgrel=2
 pkgdesc="AMD BC-250 Oberon APU Live Hardware, Power & Thermal Telemetry Suite for CachyOS"
 arch=('x86_64')
 url="https://github.com/Snk-B/BC250-Cockpit-Pro"
@@ -61,7 +61,14 @@ package() {
     install -d "${pkgdir}/usr/share/plasma/plasmoids/org.cachyos.bc250.cockpit"
     cp -r plasma/org.cachyos.bc250.cockpit/* "${pkgdir}/usr/share/plasma/plasmoids/org.cachyos.bc250.cockpit/"
 
-    # 6. Documentation and License
+    # 6. GDDR6 SMU Memory Collector Service & Payload
+    install -d "${pkgdir}/opt/bc250-memory/bc250_smu" "${pkgdir}/opt/bc250-memory/payload"
+    install -m 0644 memory/*.py memory/LICENSE.upstream memory/UPSTREAM.md memory/README.md "${pkgdir}/opt/bc250-memory/"
+    install -m 0644 memory/bc250_smu/*.py "${pkgdir}/opt/bc250-memory/bc250_smu/"
+    install -m 0644 memory/payload/SMUPayload.bin "${pkgdir}/opt/bc250-memory/payload/"
+    install -Dm644 memory/bc250-memory.service "${pkgdir}/usr/lib/systemd/system/bc250-memory.service"
+
+    # 7. Documentation and License
     install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
     install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
 }
