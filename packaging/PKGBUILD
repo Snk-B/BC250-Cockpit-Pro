@@ -2,7 +2,7 @@
 # Contributor: Antigravity AI
 pkgname=bc250-cockpit-pro
 pkgver=1.1.1
-pkgrel=4
+pkgrel=5
 pkgdesc="AMD BC-250 Oberon APU Live Hardware, Power & Thermal Telemetry Suite for CachyOS"
 arch=('x86_64')
 url="https://github.com/Snk-B/BC250-Cockpit-Pro"
