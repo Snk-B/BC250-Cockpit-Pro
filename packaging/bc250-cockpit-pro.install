@@ -24,7 +24,7 @@ post_upgrade() {
     echo ":: Restarting AMD BC-250 telemetry services..."
     systemctl try-restart apu-telemetry.service || true
     systemctl try-restart bc250-web.service || true
-    systemctl try-restart bc250-memory.service || true
+    systemctl enable --now bc250-memory.service || true
     echo ":: BC-250 Cockpit Pro updated successfully!"
 }
 
