@@ -1,4 +1,9 @@
 post_install() {
+    echo ":: Probing and loading kernel telemetry modules..."
+    modprobe bc250_memory 2>/dev/null || true
+    modprobe bc250_vrm 2>/dev/null || true
+    modprobe nct6687 2>/dev/null || true
+
     systemctl daemon-reload
     echo ":: Enabling and starting AMD BC-250 telemetry services..."
     systemctl enable --now apu-telemetry.service || true
@@ -10,6 +15,11 @@ post_install() {
 }
 
 post_upgrade() {
+    echo ":: Probing and loading kernel telemetry modules..."
+    modprobe bc250_memory 2>/dev/null || true
+    modprobe bc250_vrm 2>/dev/null || true
+    modprobe nct6687 2>/dev/null || true
+
     systemctl daemon-reload
     echo ":: Restarting AMD BC-250 telemetry services..."
     systemctl try-restart apu-telemetry.service || true

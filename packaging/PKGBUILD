@@ -2,7 +2,7 @@
 # Contributor: Antigravity AI
 pkgname=bc250-cockpit-pro
 pkgver=1.1.1
-pkgrel=2
+pkgrel=3
 pkgdesc="AMD BC-250 Oberon APU Live Hardware, Power & Thermal Telemetry Suite for CachyOS"
 arch=('x86_64')
 url="https://github.com/Snk-B/BC250-Cockpit-Pro"
@@ -68,7 +68,11 @@ package() {
     install -m 0644 memory/payload/SMUPayload.bin "${pkgdir}/opt/bc250-memory/payload/"
     install -Dm644 memory/bc250-memory.service "${pkgdir}/usr/lib/systemd/system/bc250-memory.service"
 
-    # 7. Documentation and License
+    # 7. Auto-load kernel modules configuration
+    install -d "${pkgdir}/usr/lib/modules-load.d"
+    printf "bc250_memory\nbc250_vrm\nnct6687\n" > "${pkgdir}/usr/lib/modules-load.d/bc250-cockpit.conf"
+
+    # 8. Documentation and License
     install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
     install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
 }
