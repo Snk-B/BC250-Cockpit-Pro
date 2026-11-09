@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-38bdf8.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-CachyOS%20Linux-10b981.svg?style=flat-square)](README.md)
 [![APU Architecture](https://img.shields.io/badge/APU-Zen%202%20(8C%2F16T)%20%2B%20RDNA%202%20(40%20CU)-f59e0b.svg?style=flat-square)](README.md)
+[![AI Pair-Programmer](https://img.shields.io/badge/AI%20Pair--Programmer-Google%20DeepMind%20Antigravity-4285F4.svg?style=flat-square&logo=google&logoColor=white)](https://deepmind.google)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable%20App-6366f1.svg?style=flat-square)](README.md)
 
 **AMD BC-250 Titanium Studio Cockpit** is an industrial-grade telemetry daemon, animated vector dashboard, native **KDE Plasma 6 Cyber Widgets Suite**, and standalone Progressive Web App (PWA) tailored specifically for the **AMD BC-250** (Sony PS5 *Oberon* / *Cyan Skillfish*, `gfx1013`, PCI ID `1002:13fe`).
@@ -449,7 +450,8 @@ This project builds upon the foundational reverse-engineering and research by th
 * **[MastaG (Dennis Møller)](https://github.com/MastaG/linux-cachyos-bc250)** — Dedicated AMD BC-250 kernel maintenance ([linux-cachyos-bc250](https://github.com/MastaG/linux-cachyos-bc250)), Oberon APU patch integration across all CachyOS BC-250 kernels, and hardware community enablement.
 * **[Hexxeh/bc250-vrm-dkms](https://github.com/Hexxeh/bc250-vrm-dkms)** — Pioneering NCT6687 SMBus driver implementation for the BC-250 PMIC and jumper-free VRM telemetry.
 * **[onlinermm/BC250-Telemetry](https://github.com/onlinermm/BC250-Telemetry)** — Original C++ daemon architecture and SMU mailbox reader.
-* **Titanium Studio Pro UI & PWA Edition** — Authored and refined by **Davidson Braga** with full mobile responsiveness, PWA architecture, custom Oberon icon suite, dual-mode cockpit, native KDE Plasma 6 cyber widgets suite, and dynamic CPU/GPU utilization telemetry.
+* **Titanium Studio Pro UI & PWA Edition** — Authored and refined by **Davidson Braga ([@Snk-B](https://github.com/Snk-B))** with full mobile responsiveness, PWA architecture, custom Oberon icon suite, dual-mode cockpit, native KDE Plasma 6 cyber widgets suite, and dynamic CPU/GPU utilization telemetry.
+* **[Google DeepMind Antigravity](https://deepmind.google)** — Advanced agentic AI pair-programming partner: C++ telemetry daemon refactoring, dynamic hardware topology detection (6c/12t & 8c/16t, CUs & Shaders), 60 FPS EMA transitions, official CachyOS Pacman repository packaging, and boot persistence architecture.
 
 ---
 
