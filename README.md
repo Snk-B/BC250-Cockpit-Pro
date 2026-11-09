@@ -227,7 +227,28 @@ sensors
 
 ## 🚀 Quick Start & Installation
 
-### Option A: Standard Interactive Installation (Recommended)
+### Option 1: Official CachyOS Pacman Repository (Fastest & Rolling Updates)
+
+The fastest and cleanest way to install and keep **BC-250 Cockpit Pro** updated automatically with your system:
+
+```bash
+# 1. Add the official BC-250 repository to /etc/pacman.conf:
+sudo tee -a /etc/pacman.conf << 'EOF'
+
+[bc250-cockpit]
+SigLevel = Optional TrustAll
+Server = https://snk-b.github.io/bc250-packages/$arch
+EOF
+
+# 2. Synchronize databases and install:
+sudo pacman -Sy bc250-cockpit-pro
+```
+
+*Every time you run `sudo pacman -Syu` or update CachyOS, BC-250 Cockpit Pro will update seamlessly in the background!*
+
+---
+
+### Option 2: Standard Interactive Source Installer
 
 Run the automated turnkey installer directly on your BC-250:
 
