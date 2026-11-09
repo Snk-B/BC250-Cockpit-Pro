@@ -267,7 +267,7 @@ The installer will automatically:
 
 ---
 
-### Option B: Unattended / AI-Agent Automation (Single One-Liner)
+### Option 3: Unattended / AI-Agent Automation (Single One-Liner)
 
 If you are running the setup inside a script, CI runner, or an AI coding assistant (like Antigravity, Cursor, or Claude Code) where no interactive terminal prompt is available:
 
