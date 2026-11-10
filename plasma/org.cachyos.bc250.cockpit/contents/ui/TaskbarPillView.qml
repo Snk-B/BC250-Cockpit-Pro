@@ -24,12 +24,12 @@ Item {
         anchors.fill: parent
         anchors.margins: 2
         radius: height / 2
-        color: pillMouse.containsMouse ? "#162235" : "#0d1622"
-        border.color: pillMouse.containsMouse ? "#00f0a8" : "#264f43"
+        color: (root.isCpuOverclock || root.isGpuOverclock) ? (pillMouse.containsMouse ? "#2a1410" : "#1c0d0a") : (pillMouse.containsMouse ? "#162235" : "#0d1622")
+        border.color: (root.isCpuOverclock || root.isGpuOverclock) ? "#ff4500" : (pillMouse.containsMouse ? "#00f0a8" : "#264f43")
         border.width: 1
 
-        Behavior on color { ColorAnimation { duration: 150 } }
-        Behavior on border.color { ColorAnimation { duration: 150 } }
+        Behavior on color { ColorAnimation { duration: 250 } }
+        Behavior on border.color { ColorAnimation { duration: 250 } }
 
         RowLayout {
             id: pillLayout
@@ -50,13 +50,15 @@ Item {
                     Layout.preferredWidth: 6
                     Layout.preferredHeight: 6
                     radius: 3
-                    color: "#00f0a8"
+                    color: (root.isCpuOverclock || root.isGpuOverclock) ? "#ff4500" : "#00f0a8"
                     Layout.alignment: Qt.AlignVCenter
+
+                    Behavior on color { ColorAnimation { duration: 250 } }
 
                     SequentialAnimation on opacity {
                         loops: Animation.Infinite
-                        PropertyAnimation { to: 0.4; duration: 900; easing.type: Easing.InOutQuad }
-                        PropertyAnimation { to: 1.0; duration: 900; easing.type: Easing.InOutQuad }
+                        PropertyAnimation { to: 0.4; duration: (root.isCpuOverclock || root.isGpuOverclock) ? 450 : 900; easing.type: Easing.InOutQuad }
+                        PropertyAnimation { to: 1.0; duration: (root.isCpuOverclock || root.isGpuOverclock) ? 450 : 900; easing.type: Easing.InOutQuad }
                     }
                 }
 
@@ -74,27 +76,28 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 1
                 Layout.preferredHeight: 14
-                color: "#264f43"
+                color: (root.isCpuOverclock || root.isGpuOverclock) ? "#5c1d12" : "#264f43"
                 Layout.alignment: Qt.AlignVCenter
+                Behavior on color { ColorAnimation { duration: 250 } }
             }
 
-            // 2. CPU (Largura Fixa: 56 px - Calibrada para até 4 dígitos sem oscilação)
+            // 2. CPU (Largura Calibrada para 4 digitos com espacamento sem oscilacao)
             ColumnLayout {
                 id: modCpu
-                Layout.preferredWidth: 56
+                Layout.preferredWidth: 58
                 Layout.fillWidth: false
                 Layout.alignment: Qt.AlignVCenter
                 spacing: 0
 
                 Text {
-                    text: "<font color='#64748b'>CPU</font> <font color='#ffffff'><b>" + Math.round(root.smoothCpuFreqMhz) + "</b></font><font color='#64748b'>MHz</font>"
+                    text: "<font color='" + (root.isCpuOverclock ? "#ff4500" : "#64748b") + "'>" + (root.isCpuOverclock ? "OC " : "CPU") + "</font> <font color='" + (root.isCpuOverclock ? "#ff4500" : "#ffffff") + "'><b>" + Math.round(root.smoothCpuFreqMhz) + "</b></font> <font color='#64748b'>MHz</font>"
                     textFormat: Text.RichText
                     font.family: "JetBrains Mono"
                     font.pixelSize: 8
                     Layout.alignment: Qt.AlignLeft
                 }
                 Text {
-                    text: "<font color='#64748b'>TMP</font> <font color='#38bdf8'><b>" + root.smoothCpuDieTemp.toFixed(1) + "\u00B0C</b></font>"
+                    text: "<font color='#64748b'>TMP</font> <font color='" + (root.isCpuOverclock ? "#ff7849" : "#38bdf8") + "'><b>" + root.smoothCpuDieTemp.toFixed(1) + "\u00B0C</b></font>"
                     textFormat: Text.RichText
                     font.family: "JetBrains Mono"
                     font.pixelSize: 8
@@ -106,27 +109,28 @@ Item {
             Rectangle {
                 Layout.preferredWidth: 1
                 Layout.preferredHeight: 14
-                color: "#264f43"
+                color: (root.isCpuOverclock || root.isGpuOverclock) ? "#5c1d12" : "#264f43"
                 Layout.alignment: Qt.AlignVCenter
+                Behavior on color { ColorAnimation { duration: 250 } }
             }
 
-            // 3. GPU (Largura Fixa: 56 px - Calibrada para até 4 dígitos sem oscilação)
+            // 3. GPU (Largura Calibrada para 4 digitos com espacamento sem oscilacao)
             ColumnLayout {
                 id: modGpu
-                Layout.preferredWidth: 56
+                Layout.preferredWidth: 58
                 Layout.fillWidth: false
                 Layout.alignment: Qt.AlignVCenter
                 spacing: 0
 
                 Text {
-                    text: "<font color='#64748b'>GPU</font> <font color='#ffffff'><b>" + Math.round(root.smoothGpuSclkMhz) + "</b></font><font color='#64748b'>MHz</font>"
+                    text: "<font color='" + (root.isGpuOverclock ? "#ff3300" : "#64748b") + "'>" + (root.isGpuOverclock ? "OC " : "GPU") + "</font> <font color='" + (root.isGpuOverclock ? "#ff3300" : "#ffffff") + "'><b>" + Math.round(root.smoothGpuSclkMhz) + "</b></font> <font color='#64748b'>MHz</font>"
                     textFormat: Text.RichText
                     font.family: "JetBrains Mono"
                     font.pixelSize: 8
                     Layout.alignment: Qt.AlignLeft
                 }
                 Text {
-                    text: "<font color='#64748b'>TMP</font> <font color='#00f0a8'><b>" + root.smoothGpuDieTemp.toFixed(1) + "\u00B0C</b></font>"
+                    text: "<font color='#64748b'>TMP</font> <font color='" + (root.isGpuOverclock ? "#ff5252" : "#00f0a8") + "'><b>" + root.smoothGpuDieTemp.toFixed(1) + "\u00B0C</b></font>"
                     textFormat: Text.RichText
                     font.family: "JetBrains Mono"
                     font.pixelSize: 8
@@ -142,7 +146,7 @@ Item {
                 Layout.alignment: Qt.AlignVCenter
             }
 
-            // 4. VRM + SMU (Largura Fixa: 62 px - Calibrada para 3 dígitos de Watts e Temps)
+            // 4. VRM + SMU (Largura Fixa: 62 px - Calibrada para 3 digitos de Watts e Temps)
             ColumnLayout {
                 id: modVrm
                 Layout.preferredWidth: 62
@@ -174,16 +178,16 @@ Item {
                 Layout.alignment: Qt.AlignVCenter
             }
 
-            // 5. COOLING FAN + PWM (Largura Fixa: 78 px - Calibrada para até 4 dígitos de RPM e '100% ATIVO')
+            // 5. COOLING FAN + PWM (Largura Calibrada para 4 digitos de RPM e '100% ATIVO')
             ColumnLayout {
                 id: modFan
-                Layout.preferredWidth: 78
+                Layout.preferredWidth: 74
                 Layout.fillWidth: false
                 Layout.alignment: Qt.AlignVCenter
                 spacing: 0
 
                 Text {
-                    text: "<font color='#64748b'>FAN</font> <font color='#ffffff'><b>" + Math.round(root.smoothFanRpm) + "</b></font><font color='#64748b'>RPM</font>"
+                    text: "<font color='#64748b'>FAN</font> <font color='#ffffff'><b>" + Math.round(root.smoothFanRpm) + "</b></font> <font color='#64748b'>RPM</font>"
                     textFormat: Text.RichText
                     font.family: "JetBrains Mono"
                     font.pixelSize: 8

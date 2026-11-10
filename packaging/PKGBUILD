@@ -1,8 +1,8 @@
 # Maintainer: Davidson Braga <davidson@cachyos.org>
 # Contributor: Antigravity AI
 pkgname=bc250-cockpit-pro
-pkgver=1.1.1
-pkgrel=5
+pkgver=1.1.2
+pkgrel=1
 pkgdesc="AMD BC-250 Oberon APU Live Hardware, Power & Thermal Telemetry Suite for CachyOS"
 arch=('x86_64')
 url="https://github.com/Snk-B/BC250-Cockpit-Pro"

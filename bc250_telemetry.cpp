@@ -618,7 +618,10 @@ static long read_gpu_busy(HwmonDevice &amdgpu) {
     if (busy >= 0) return busy;
     busy = amdgpu.read("busy_percent");
     if (busy >= 0) return busy;
-    if (sysfs::read_long(sysfs::root() + "/class/drm/card0/device/gpu_busy_percent", busy)) return busy;
+    if (!amdgpu.dir.empty() && sysfs::read_long(amdgpu.dir + "/device/gpu_busy_percent", busy)) return busy;
+    for (int card = 0; card < 4; ++card) {
+        if (sysfs::read_long(sysfs::root() + "/class/drm/card" + to_string(card) + "/device/gpu_busy_percent", busy)) return busy;
+    }
     return -1;
 }
 

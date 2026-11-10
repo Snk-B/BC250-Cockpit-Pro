@@ -30,6 +30,11 @@ Item {
         property string title: "APU"
         property string subinfo: ""
         property string centerSub: ""
+        property bool isOverclock: false
+
+        Behavior on strokeColor {
+            ColorAnimation { duration: 320; easing.type: Easing.OutQuad }
+        }
 
         Layout.fillWidth: true
         Layout.minimumWidth: 68
@@ -45,12 +50,12 @@ Item {
                 width: 68
                 height: 68
 
-                // Canvas is 68x68 with radius 25 and shadowBlur 5 - 100% identical size
+                // Canvas is 76x76 centered inside 68x68, giving 11px padding around radius 25 so glow never clips
                 Canvas {
                     id: canvas
                     anchors.centerIn: parent
-                    width: 68
-                    height: 68
+                    width: 76
+                    height: 76
                     renderTarget: Canvas.Image
 
                     onPaint: {
@@ -72,13 +77,13 @@ Item {
                         var start = -Math.PI / 2;
                         var end = start + frac * (Math.PI * 2);
 
-                        // Pass 1: Radiant Soft Neon Bloom Glow
+                        // Pass 1: Radiant Soft Neon Bloom Glow (smooth circular glow identical in shape to nominal dials)
                         ctx.shadowColor = gaugeItem.strokeColor.toString();
-                        ctx.shadowBlur = 5;
+                        ctx.shadowBlur = gaugeItem.isOverclock ? 6 : 5;
                         ctx.beginPath();
                         ctx.arc(cx, cy, r, start, end);
                         ctx.strokeStyle = gaugeItem.strokeColor.toString();
-                        ctx.lineWidth = 3.5;
+                        ctx.lineWidth = gaugeItem.isOverclock ? 4.0 : 3.5;
                         ctx.lineCap = "round";
                         ctx.stroke();
 
@@ -95,6 +100,8 @@ Item {
                     Connections {
                         target: gaugeItem
                         function onValueChanged() { canvas.requestPaint(); }
+                        function onStrokeColorChanged() { canvas.requestPaint(); }
+                        function onIsOverclockChanged() { canvas.requestPaint(); }
                     }
                 }
 
@@ -115,7 +122,7 @@ Item {
                         }
                         Text {
                             text: "\u00B0C"
-                            color: "#fde047"
+                            color: gaugeItem.isOverclock ? gaugeItem.strokeColor : "#fde047"
                             font.family: "JetBrains Mono"
                             font.pixelSize: 7
                             font.bold: true
@@ -124,7 +131,7 @@ Item {
 
                     Text {
                         text: gaugeItem.centerSub
-                        color: "#64748b"
+                        color: gaugeItem.isOverclock ? gaugeItem.strokeColor : "#64748b"
                         font.family: "JetBrains Mono"
                         font.pixelSize: 7
                         font.bold: true
@@ -137,16 +144,17 @@ Item {
                 text: gaugeItem.title
                 color: gaugeItem.strokeColor
                 font.family: "JetBrains Mono"
-                font.pixelSize: 8
+                font.pixelSize: gaugeItem.isOverclock ? 7.5 : 8
                 font.bold: true
                 Layout.alignment: Qt.AlignHCenter
             }
 
             Text {
                 text: gaugeItem.subinfo
-                color: "#94a3b8"
+                color: gaugeItem.isOverclock ? "#fca5a5" : "#94a3b8"
                 font.family: "JetBrains Mono"
                 font.pixelSize: 7
+                font.bold: gaugeItem.isOverclock
                 Layout.alignment: Qt.AlignHCenter
             }
         }
@@ -208,12 +216,14 @@ Item {
 
                 // Fully rounded oval pill badge with generous padding around the glowing dot
                 Rectangle {
-                    color: "#11261f"
-                    border.color: "#1e5244"
+                    color: (root.isCpuOverclock || root.isGpuOverclock) ? "#2b100c" : "#11261f"
+                    border.color: (root.isCpuOverclock || root.isGpuOverclock) ? "#6e2316" : "#1e5244"
                     border.width: 1
                     radius: 10
-                    implicitWidth: 80
+                    implicitWidth: (root.isCpuOverclock || root.isGpuOverclock) ? 88 : 80
                     implicitHeight: 20
+                    Behavior on color { ColorAnimation { duration: 320 } }
+                    Behavior on border.color { ColorAnimation { duration: 320 } }
 
                     RowLayout {
                         anchors.centerIn: parent
@@ -222,16 +232,18 @@ Item {
                             width: 5
                             height: 5
                             radius: 2
-                            color: "#00f0a8"
+                            color: (root.isCpuOverclock || root.isGpuOverclock) ? "#ff4500" : "#00f0a8"
                             Layout.alignment: Qt.AlignVCenter
+                            Behavior on color { ColorAnimation { duration: 320 } }
                         }
                         Text {
-                            text: root.gpuCuActive + " CUs ONLINE"
-                            color: "#00f0a8"
+                            text: (root.isCpuOverclock || root.isGpuOverclock) ? "OC ACTIVE" : (root.gpuCuActive + " CUs ONLINE")
+                            color: (root.isCpuOverclock || root.isGpuOverclock) ? "#ffedd5" : "#00f0a8"
                             font.family: "JetBrains Mono"
                             font.pixelSize: 7
                             font.bold: true
                             Layout.alignment: Qt.AlignVCenter
+                            Behavior on color { ColorAnimation { duration: 320 } }
                         }
                     }
                 }
@@ -248,10 +260,11 @@ Item {
                 CircularGauge {
                     value: root.smoothCpuDieTemp
                     displayValue: root.smoothCpuDieTemp
-                    strokeColor: "#38bdf8"
-                    centerSub: "CPU DIE"
-                    title: "CPU ZEN 2"
-                    subinfo: root.cpuCores + "c / " + root.cpuThreads + "t \u00B7 " + root.cpuMaxTempC + "\u00B0C"
+                    isOverclock: root.isCpuOverclock
+                    strokeColor: root.isCpuOverclock ? "#ff4500" : "#38bdf8"
+                    centerSub: root.isCpuOverclock ? "BOOST" : "CPU DIE"
+                    title: root.isCpuOverclock ? "CPU OVERCLOCK" : "CPU ZEN 2"
+                    subinfo: root.isCpuOverclock ? (Math.round(root.smoothCpuFreqMhz) + " MHz BOOST") : (root.cpuCores + "c / " + root.cpuThreads + "t \u00B7 " + root.cpuMaxTempC + "\u00B0C")
                 }
 
                 Rectangle {
@@ -265,10 +278,11 @@ Item {
                 CircularGauge {
                     value: root.smoothGpuDieTemp
                     displayValue: root.smoothGpuDieTemp
-                    strokeColor: "#00f0a8"
-                    centerSub: "GPU DIE"
-                    title: "GPU RDNA2"
-                    subinfo: root.gpuCuActive + " CUs \u00B7 " + root.gpuShaders + " SH"
+                    isOverclock: root.isGpuOverclock
+                    strokeColor: root.isGpuOverclock ? "#ff3300" : "#00f0a8"
+                    centerSub: root.isGpuOverclock ? "BOOST" : "GPU DIE"
+                    title: root.isGpuOverclock ? "GPU OVERCLOCK" : "GPU RDNA2"
+                    subinfo: root.isGpuOverclock ? (Math.round(root.smoothGpuSclkMhz) + " MHz BOOST") : (root.gpuCuActive + " CUs \u00B7 " + root.gpuShaders + " SH")
                 }
 
                 Rectangle {
@@ -303,11 +317,12 @@ Item {
                     implicitHeight: 45
                     color: "#060a12"
                     radius: 6
-                    border.color: "#15202c"
+                    border.color: root.isCpuOverclock ? "#6b1e16" : "#15202c"
+                    Behavior on border.color { ColorAnimation { duration: 320 } }
 
                     Rectangle {
                         width: 3
-                        color: "#38bdf8"
+                        color: root.isCpuOverclock ? "#ff4500" : "#38bdf8"
                         radius: 2
                         anchors.left: parent.left
                         anchors.leftMargin: 3
@@ -315,6 +330,7 @@ Item {
                         anchors.topMargin: 5
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 5
+                        Behavior on color { ColorAnimation { duration: 320 } }
                     }
 
                     ColumnLayout {
@@ -329,12 +345,25 @@ Item {
                             Layout.fillWidth: true
                             RowLayout {
                                 spacing: 4
-                                Kirigami.Icon { source: "cpu"; implicitWidth: 12; implicitHeight: 12; color: "#38bdf8" }
-                                Text { text: "CPU Zen 2 Frequency"; color: "#e2e8f0"; font.family: "JetBrains Mono"; font.pixelSize: 10; font.bold: true }
+                                Kirigami.Icon {
+                                    source: "cpu"
+                                    implicitWidth: 12
+                                    implicitHeight: 12
+                                    color: root.isCpuOverclock ? "#ff4500" : "#38bdf8"
+                                    Behavior on color { ColorAnimation { duration: 320 } }
+                                }
+                                Text {
+                                    text: root.isCpuOverclock ? "CPU Zen 2 (Overclock)" : (root.isPortuguese ? "Frequ\u00EAncia CPU Zen 2" : "CPU Zen 2 Frequency")
+                                    color: root.isCpuOverclock ? "#ffedd5" : "#e2e8f0"
+                                    font.family: "JetBrains Mono"
+                                    font.pixelSize: 10
+                                    font.bold: true
+                                    Behavior on color { ColorAnimation { duration: 320 } }
+                                }
                             }
                             Item { Layout.fillWidth: true }
                             Text {
-                                text: "<font color='#ffffff'><b>" + Math.round(root.smoothCpuFreqMhz) + "</b></font> <font color='#64748b' size='-1'>/ " + root.cpuTargetFreqMhz + " MHz</font>"
+                                text: "<font color='" + (root.isCpuOverclock ? "#ff4500" : "#ffffff") + "'><b>" + Math.round(root.smoothCpuFreqMhz) + "</b></font> <font color='#64748b' size='-1'>/ " + root.cpuTargetFreqMhz + " MHz</font>"
                                 textFormat: Text.RichText
                                 font.family: "JetBrains Mono"
                                 font.pixelSize: 10
@@ -378,7 +407,7 @@ Item {
                                     ctx.lineTo(w, h);
                                     ctx.lineTo(0, h);
                                     ctx.closePath();
-                                    ctx.fillStyle = "rgba(56, 189, 248, 0.16)";
+                                    ctx.fillStyle = root.isCpuOverclock ? "rgba(255, 69, 0, 0.22)" : "rgba(56, 189, 248, 0.16)";
                                     ctx.fill();
 
                                     ctx.beginPath();
@@ -390,7 +419,7 @@ Item {
                                         var prevYj = h - Math.min(h - 2, Math.max(2, ((hist[j - 1] - minVal) / (maxVal - minVal)) * (h - 4) + 2));
                                         ctx.bezierCurveTo((prevXj + xj) / 2, prevYj, (prevXj + xj) / 2, yj, xj, yj);
                                     }
-                                    ctx.strokeStyle = "#38bdf8";
+                                    ctx.strokeStyle = root.isCpuOverclock ? "#ff4500" : "#38bdf8";
                                     ctx.lineWidth = 1.4;
                                     ctx.stroke();
                                 }
@@ -398,6 +427,7 @@ Item {
                                 Connections {
                                     target: root
                                     function onCpuFreqHistoryChanged() { cpuSparkCanvas.requestPaint(); }
+                                    function onIsCpuOverclockChanged() { cpuSparkCanvas.requestPaint(); }
                                 }
                             }
 
@@ -405,15 +435,18 @@ Item {
                                 implicitWidth: 54
                                 height: 17
                                 radius: 3
-                                color: "#102330"
-                                border.color: "#1c3c4f"
+                                color: root.isCpuOverclock ? "#2d120a" : "#102330"
+                                border.color: root.isCpuOverclock ? "#5a2214" : "#1c3c4f"
+                                Behavior on color { ColorAnimation { duration: 320 } }
+                                Behavior on border.color { ColorAnimation { duration: 320 } }
                                 Text {
                                     anchors.centerIn: parent
                                     text: root.smoothCpuUsagePct.toFixed(0) + (root.isPortuguese ? "% CARGA" : "% LOAD")
-                                    color: "#38bdf8"
+                                    color: root.isCpuOverclock ? "#ff7849" : "#38bdf8"
                                     font.family: "JetBrains Mono"
                                     font.pixelSize: 8
                                     font.bold: true
+                                    Behavior on color { ColorAnimation { duration: 320 } }
                                 }
                             }
                         }
@@ -426,11 +459,12 @@ Item {
                     implicitHeight: 45
                     color: "#060a12"
                     radius: 6
-                    border.color: "#122a22"
+                    border.color: root.isGpuOverclock ? "#6b1410" : "#122a22"
+                    Behavior on border.color { ColorAnimation { duration: 320 } }
 
                     Rectangle {
                         width: 3
-                        color: "#00f0a8"
+                        color: root.isGpuOverclock ? "#ff3300" : "#00f0a8"
                         radius: 2
                         anchors.left: parent.left
                         anchors.leftMargin: 3
@@ -438,6 +472,7 @@ Item {
                         anchors.topMargin: 5
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 5
+                        Behavior on color { ColorAnimation { duration: 320 } }
                     }
 
                     ColumnLayout {
@@ -452,12 +487,25 @@ Item {
                             Layout.fillWidth: true
                             RowLayout {
                                 spacing: 4
-                                Kirigami.Icon { source: "video-card"; implicitWidth: 12; implicitHeight: 12; color: "#00f0a8" }
-                                Text { text: "GPU Oberon Frequency"; color: "#e2e8f0"; font.family: "JetBrains Mono"; font.pixelSize: 10; font.bold: true }
+                                Kirigami.Icon {
+                                    source: "video-card"
+                                    implicitWidth: 12
+                                    implicitHeight: 12
+                                    color: root.isGpuOverclock ? "#ff3300" : "#00f0a8"
+                                    Behavior on color { ColorAnimation { duration: 320 } }
+                                }
+                                Text {
+                                    text: root.isGpuOverclock ? "GPU Oberon (Overclock)" : (root.isPortuguese ? "Frequ\u00EAncia GPU Oberon" : "GPU Oberon Frequency")
+                                    color: root.isGpuOverclock ? "#fff1f2" : "#e2e8f0"
+                                    font.family: "JetBrains Mono"
+                                    font.pixelSize: 10
+                                    font.bold: true
+                                    Behavior on color { ColorAnimation { duration: 320 } }
+                                }
                             }
                             Item { Layout.fillWidth: true }
                             Text {
-                                text: "<font color='#ffffff'><b>" + Math.round(root.smoothGpuSclkMhz) + "</b></font> <font color='#64748b' size='-1'>/ " + root.gpuMaxFreqMhz + " MHz</font>"
+                                text: "<font color='" + (root.isGpuOverclock ? "#ff3300" : "#ffffff") + "'><b>" + Math.round(root.smoothGpuSclkMhz) + "</b></font> <font color='#64748b' size='-1'>/ " + root.gpuMaxFreqMhz + " MHz</font>"
                                 textFormat: Text.RichText
                                 font.family: "JetBrains Mono"
                                 font.pixelSize: 10
@@ -501,7 +549,7 @@ Item {
                                     ctx.lineTo(w, h);
                                     ctx.lineTo(0, h);
                                     ctx.closePath();
-                                    ctx.fillStyle = "rgba(0, 240, 168, 0.16)";
+                                    ctx.fillStyle = root.isGpuOverclock ? "rgba(255, 51, 0, 0.22)" : "rgba(0, 240, 168, 0.16)";
                                     ctx.fill();
 
                                     ctx.beginPath();
@@ -513,7 +561,7 @@ Item {
                                         var prevYj = h - Math.min(h - 2, Math.max(2, ((hist[j - 1] - minVal) / (maxVal - minVal)) * (h - 4) + 2));
                                         ctx.bezierCurveTo((prevXj + xj) / 2, prevYj, (prevXj + xj) / 2, yj, xj, yj);
                                     }
-                                    ctx.strokeStyle = "#00f0a8";
+                                    ctx.strokeStyle = root.isGpuOverclock ? "#ff3300" : "#00f0a8";
                                     ctx.lineWidth = 1.4;
                                     ctx.stroke();
                                 }
@@ -521,6 +569,7 @@ Item {
                                 Connections {
                                     target: root
                                     function onGpuFreqHistoryChanged() { gpuSparkCanvas.requestPaint(); }
+                                    function onIsGpuOverclockChanged() { gpuSparkCanvas.requestPaint(); }
                                 }
                             }
 
@@ -528,15 +577,18 @@ Item {
                                 implicitWidth: 54
                                 height: 17
                                 radius: 3
-                                color: "#0e261f"
-                                border.color: "#1c4a3b"
+                                color: root.isGpuOverclock ? "#2d0e08" : "#0e261f"
+                                border.color: root.isGpuOverclock ? "#5c1d12" : "#1c4a3b"
+                                Behavior on color { ColorAnimation { duration: 320 } }
+                                Behavior on border.color { ColorAnimation { duration: 320 } }
                                 Text {
                                     anchors.centerIn: parent
                                     text: root.smoothGpuBusyPct.toFixed(0) + (root.isPortuguese ? "% CARGA" : "% LOAD")
-                                    color: "#34d399"
+                                    color: root.isGpuOverclock ? "#ff6b4a" : "#34d399"
                                     font.family: "JetBrains Mono"
                                     font.pixelSize: 8
                                     font.bold: true
+                                    Behavior on color { ColorAnimation { duration: 320 } }
                                 }
                             }
                         }

@@ -152,6 +152,10 @@ PlasmoidItem {
     property real smoothCpuFreqMhz: rawCpuFreqMhz
     property real smoothGpuSclkMhz: rawGpuSclkMhz
 
+    // Dynamic Overclock Active State Detectors (CPU >= 3500 MHz, GPU >= 1500 MHz - Identical to web cockpit)
+    readonly property bool isCpuOverclock: (smoothCpuFreqMhz >= 3500)
+    readonly property bool isGpuOverclock: (smoothGpuSclkMhz >= 1500)
+
     property real smoothCpuUsagePct: rawCpuUsagePct
     property real smoothGpuBusyPct: rawGpuBusyPct
 

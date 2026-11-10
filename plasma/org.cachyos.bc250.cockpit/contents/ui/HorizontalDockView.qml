@@ -121,20 +121,22 @@ Item {
                     Layout.fillHeight: true
                     color: "#060b13"
                     radius: 7
-                    border.color: "#163447"
+                    border.color: root.isCpuOverclock ? "#4a1c14" : "#163447"
                     border.width: 1
+                    Behavior on border.color { ColorAnimation { duration: 320 } }
 
-                    // Left Cyan Neon Accent: Pílula arredondada interna que orna perfeitamente com a borda
+                    // Left Cyan/Fire Neon Accent: Pílula arredondada interna que orna perfeitamente com a borda
                     Rectangle {
                         width: 3
                         radius: 2
-                        color: "#38bdf8"
+                        color: root.isCpuOverclock ? "#ff4500" : "#38bdf8"
                         anchors.left: parent.left
                         anchors.leftMargin: 3
                         anchors.top: parent.top
                         anchors.topMargin: 5
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 5
+                        Behavior on color { ColorAnimation { duration: 320 } }
                     }
 
                     ColumnLayout {
@@ -146,11 +148,12 @@ Item {
                         spacing: 1
 
                         Text {
-                            text: "CPU ZEN 2 DIE"
-                            color: "#38bdf8"
+                            text: root.isCpuOverclock ? "CPU ZEN 2 (OC)" : "CPU ZEN 2 DIE"
+                            color: root.isCpuOverclock ? "#ff4500" : "#38bdf8"
                             font.family: "JetBrains Mono"
                             font.pixelSize: 7
                             font.bold: true
+                            Behavior on color { ColorAnimation { duration: 320 } }
                         }
                         Text {
                             text: "<font color='#ffffff'><b>" + root.smoothCpuDieTemp.toFixed(1) + "</b></font><font color='#fde047'>\u00B0C</font>"
@@ -174,20 +177,22 @@ Item {
                     Layout.fillHeight: true
                     color: "#060b13"
                     radius: 7
-                    border.color: "#102f23"
+                    border.color: root.isGpuOverclock ? "#4a1410" : "#102f23"
                     border.width: 1
+                    Behavior on border.color { ColorAnimation { duration: 320 } }
 
-                    // Left Emerald Neon Accent: Pílula arredondada interna
+                    // Left Emerald/Crimson Neon Accent: Pílula arredondada interna
                     Rectangle {
                         width: 3
                         radius: 2
-                        color: "#00f0a8"
+                        color: root.isGpuOverclock ? "#ff3300" : "#00f0a8"
                         anchors.left: parent.left
                         anchors.leftMargin: 3
                         anchors.top: parent.top
                         anchors.topMargin: 5
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 5
+                        Behavior on color { ColorAnimation { duration: 320 } }
                     }
 
                     ColumnLayout {
@@ -199,11 +204,12 @@ Item {
                         spacing: 1
 
                         Text {
-                            text: "GPU RDNA2 DIE"
-                            color: "#00f0a8"
+                            text: root.isGpuOverclock ? "GPU RDNA2 (OC)" : "GPU RDNA2 DIE"
+                            color: root.isGpuOverclock ? "#ff3300" : "#00f0a8"
                             font.family: "JetBrains Mono"
                             font.pixelSize: 7
                             font.bold: true
+                            Behavior on color { ColorAnimation { duration: 320 } }
                         }
                         Text {
                             text: "<font color='#ffffff'><b>" + root.smoothGpuDieTemp.toFixed(1) + "</b></font><font color='#fde047'>\u00B0C</font>"
@@ -320,22 +326,25 @@ Item {
                                 width: 20
                                 height: 11
                                 radius: 2.5
-                                color: "#122a38"
-                                border.color: "#20465c"
+                                color: root.isCpuOverclock ? "#38140a" : "#122a38"
+                                border.color: root.isCpuOverclock ? "#7a2b16" : "#20465c"
                                 border.width: 1
+                                Behavior on color { ColorAnimation { duration: 320 } }
+                                Behavior on border.color { ColorAnimation { duration: 320 } }
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: "CPU"
-                                    color: "#38bdf8"
+                                    color: root.isCpuOverclock ? "#ff4500" : "#38bdf8"
                                     font.family: "JetBrains Mono"
                                     font.pixelSize: 6
                                     font.bold: true
+                                    Behavior on color { ColorAnimation { duration: 320 } }
                                 }
                             }
 
                             Text {
-                                text: "<font color='#ffffff'><b>" + Math.round(root.smoothCpuFreqMhz) + "</b></font> <font color='#64748b' size='-2'>/ " + root.cpuTargetFreqMhz + "</font>"
+                                text: "<font color='" + (root.isCpuOverclock ? "#ff4500" : "#ffffff") + "'><b>" + Math.round(root.smoothCpuFreqMhz) + "</b></font> <font color='#64748b' size='-2'>/ " + root.cpuTargetFreqMhz + "</font>"
                                 textFormat: Text.RichText
                                 font.family: "JetBrains Mono"
                                 font.pixelSize: 8
@@ -350,22 +359,25 @@ Item {
                                 width: 20
                                 height: 11
                                 radius: 2.5
-                                color: "#0d261e"
-                                border.color: "#194d3d"
+                                color: root.isGpuOverclock ? "#380f08" : "#0d261e"
+                                border.color: root.isGpuOverclock ? "#7a1e12" : "#194d3d"
                                 border.width: 1
+                                Behavior on color { ColorAnimation { duration: 320 } }
+                                Behavior on border.color { ColorAnimation { duration: 320 } }
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: "GPU"
-                                    color: "#00f0a8"
+                                    color: root.isGpuOverclock ? "#ff3300" : "#00f0a8"
                                     font.family: "JetBrains Mono"
                                     font.pixelSize: 6
                                     font.bold: true
+                                    Behavior on color { ColorAnimation { duration: 320 } }
                                 }
                             }
 
                             Text {
-                                text: "<font color='#ffffff'><b>" + Math.round(root.smoothGpuSclkMhz) + "</b></font> <font color='#64748b' size='-2'>/ " + root.gpuMaxFreqMhz + "</font>"
+                                text: "<font color='" + (root.isGpuOverclock ? "#ff3300" : "#ffffff") + "'><b>" + Math.round(root.smoothGpuSclkMhz) + "</b></font> <font color='#64748b' size='-2'>/ " + root.gpuMaxFreqMhz + "</font>"
                                 textFormat: Text.RichText
                                 font.family: "JetBrains Mono"
                                 font.pixelSize: 8

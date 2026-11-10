@@ -21,11 +21,9 @@ post_upgrade() {
     modprobe nct6687 2>/dev/null || true
 
     systemctl daemon-reload
-    echo ":: Restarting AMD BC-250 telemetry services..."
+    echo ":: Enabling and restarting AMD BC-250 telemetry services..."
     systemctl enable --now apu-telemetry.service || true
-    systemctl restart apu-telemetry.service || true
     systemctl enable --now bc250-web.service || true
-    systemctl restart bc250-web.service || true
     systemctl enable --now bc250-memory.service || true
     echo ":: BC-250 Cockpit Pro updated successfully!"
 }
