@@ -1,4 +1,20 @@
+check_governor_safety() {
+    local conf="/etc/cyan-skillfish-governor-smu/config.toml"
+    if [ -f "$conf" ]; then
+        if grep -Eiq '^[[:space:]]*set-method[[:space:]]*=[[:space:]]*"?smu"?' "$conf"; then
+            echo ":: WARNING: /etc/cyan-skillfish-governor-smu/config.toml has set-method = \"smu\"."
+            echo ":: Raw SMU writes to offset 0xb8 collide with kernel mailbox queries and cause GPU ring timeouts."
+            echo ":: Recommended fix: change to 'set-method = \"kernel\"'"
+        fi
+        if grep -Eiq '^[[:space:]]*fix-metrics[[:space:]]*=[[:space:]]*true' "$conf"; then
+            echo ":: WARNING: /etc/cyan-skillfish-governor-smu/config.toml has fix-metrics = true."
+            echo ":: Rapid polling of gpu_metrics saturates SMU Queue 3 (msg 0x3c). Recommended: 'fix-metrics = false'"
+        fi
+    fi
+}
+
 post_install() {
+    check_governor_safety
     echo ":: Probing and loading kernel telemetry modules..."
     modprobe bc250_memory 2>/dev/null || true
     modprobe bc250_vrm 2>/dev/null || true
@@ -15,6 +31,7 @@ post_install() {
 }
 
 post_upgrade() {
+    check_governor_safety
     echo ":: Probing and loading kernel telemetry modules..."
     modprobe bc250_memory 2>/dev/null || true
     modprobe bc250_vrm 2>/dev/null || true

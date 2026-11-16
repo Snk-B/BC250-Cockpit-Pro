@@ -255,11 +255,22 @@ sudo ./install.sh
 ```
 
 The installer will automatically:
-1. Detect your hardware sensors, kernel modules, and Linux distribution.
-2. Compile the high-performance `apu_telemetry` binary.
-3. Install and configure systemd background services (`apu-telemetry.service` and `bc250-web.service`).
-4. Register the **KDE Plasma 6 Cyber Widgets Suite** (`org.cachyos.bc250.cockpit`) into both system and user plasmoids directories, deploy the icon suite, and refresh KDE sycoca.
-5. Launch the Titanium Studio Pro web dashboard on port `8090`.
+1. **Audit SMU & Governor Safety:** Inspects `/etc/cyan-skillfish-governor-smu/config.toml` for dangerous userspace SMU writes (`set-method = "smu"`) or rapid `gpu_metrics` polling (`fix-metrics = true`) that trigger mailbox collisions and GPU ring timeouts on modern kernels, offering an automatic one-click hardening patch.
+2. Detect your hardware sensors, kernel modules, and Linux distribution.
+3. Compile the high-performance `apu_telemetry` binary.
+4. Install and configure systemd background services (`apu-telemetry.service` and `bc250-web.service`).
+5. Register the **KDE Plasma 6 Cyber Widgets Suite** (`org.cachyos.bc250.cockpit`) into both system and user plasmoids directories, deploy the icon suite, and refresh KDE sycoca.
+6. Launch the Titanium Studio Pro web dashboard on port `8090`.
+
+---
+
+---
+
+### 🛡️ Advanced Installer Flags
+
+* `--fix-governor`: Automatically inspects and patches `/etc/cyan-skillfish-governor-smu/config.toml` to safe kernel DPM mode (`set-method = "kernel"`, `fix-metrics = false`), preventing SMU timeouts without prompting.
+* `--dry-run`: Prints the detected sensors, components, and installation plan without modifying any system files or services.
+* `--dashboard=v1|v2`: Pre-selects the default Web Dashboard style for unattended headless setups.
 
 ---
 

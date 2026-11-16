@@ -10,12 +10,141 @@ MEMORY_MODE_FLAG=detect
 COMPONENTS_FLAG=""
 DRY_RUN_FLAG=0
 
+
+
+
+# Colors fallback if not set by caller (prevents set -u unbound variable)
+GREEN="${GREEN:-[0;32m}"
+BLUE="${BLUE:-[0;34m}"
+YELLOW="${YELLOW:-[1;33m}"
+RED="${RED:-[0;31m}"
+NC="${NC:-[0m}"
+CYAN="${CYAN:-[0;36m}"
+BOLD="${BOLD:-[1m}"
+DIM="${DIM:-[2m}"
+
+FIX_GOVERNOR_FLAG=0
+
+# Returns 0 if config has no known conflicts, or 1 if dangerous settings found.
+check_governor_smu_config() {
+    local conf="${1:-/etc/cyan-skillfish-governor-smu/config.toml}"
+    [ -f "$conf" ] || return 0
+
+    local bad=0
+    # 1. set-method = "smu"
+    if grep -Eiq '^[[:space:]]*set-method[[:space:]]*=[[:space:]]*"?smu"?' "$conf"; then
+        bad=1
+    fi
+    # 2. fix-metrics = true
+    if grep -Eiq '^[[:space:]]*fix-metrics[[:space:]]*=[[:space:]]*true' "$conf"; then
+        bad=1
+    fi
+    return "$bad"
+}
+
+# Audit governor configuration and print clear warnings or offer to patch
+audit_governor_config() {
+    local conf="${1:-/etc/cyan-skillfish-governor-smu/config.toml}"
+    if [ ! -f "$conf" ]; then
+        echo -e "  ${DIM}No cyan-skillfish-governor-smu config found at $conf (skipped)${NC}"
+        return 0
+    fi
+
+    local bad_set_method=0
+    local bad_fix_metrics=0
+    local bad_temp_read=0
+    local has_issue=0
+
+    if grep -Eiq '^[[:space:]]*set-method[[:space:]]*=[[:space:]]*"?smu"?' "$conf"; then
+        bad_set_method=1
+        has_issue=1
+    fi
+    if grep -Eiq '^[[:space:]]*fix-metrics[[:space:]]*=[[:space:]]*true' "$conf"; then
+        bad_fix_metrics=1
+        has_issue=1
+    fi
+    if grep -Eiq '^[[:space:]]*temp-read[[:space:]]*=[[:space:]]*"?sysfs"?' "$conf"; then
+        local hwmon_temp="/sys/bus/pci/devices/0000:01:00.0/hwmon/hwmon1/temp1_input"
+        if [ ! -r "$hwmon_temp" ] || ! cat "$hwmon_temp" >/dev/null 2>&1; then
+            bad_temp_read=1
+            has_issue=1
+        fi
+    fi
+
+    if [ "$has_issue" = 0 ]; then
+        echo -e "  ${GREEN}✓${NC} Cyan Skillfish GPU Governor config is verified safe (kernel DPM mode)"
+        return 0
+    fi
+
+    echo -e "  ${YELLOW}⚠ POTENTIAL SMU CONFLICT IN GOVERNOR CONFIG:${NC}"
+    echo -e "    File: ${BOLD}$conf${NC}"
+    if [ "$bad_set_method" = 1 ]; then
+        echo -e "    ${YELLOW}• set-method = \"smu\"${NC} writes raw PCI config offset 0xb8 from userspace."
+        echo -e "      On modern kernels, this collides with kernel SMU mailbox queries, causing timeouts and GPU ring resets."
+        echo -e "      ${CYAN}-> Recommended: set-method = \"kernel\"${NC}"
+    fi
+    if [ "$bad_fix_metrics" = 1 ]; then
+        echo -e "    ${YELLOW}• fix-metrics = true${NC} floods SMU Queue 3 with msg 0x3c polling."
+        echo -e "      ${CYAN}-> Recommended: fix-metrics = false${NC}"
+    fi
+    if [ "$bad_temp_read" = 1 ]; then
+        echo -e "    ${YELLOW}• temp-read = \"sysfs\"${NC} fails on this kernel with 'Operation not supported' (os error 95)."
+        echo -e "      ${CYAN}-> Recommended: temp-read = \"drm\"${NC}"
+    fi
+
+    local do_patch=0
+    if [ "$FIX_GOVERNOR_FLAG" = 1 ]; then
+        do_patch=1
+    elif [ -t 0 ] && [ "$DRY_RUN_FLAG" = 0 ]; then
+        echo
+        echo -ne "    ${BOLD}Would you like to automatically patch $conf to safe values? [Y/n]: ${NC}"
+        read -r reply
+        case "$reply" in
+            [nN]*) do_patch=0 ;;
+            *) do_patch=1 ;;
+        esac
+    fi
+
+    if [ "$do_patch" = 1 ]; then
+        patch_governor_config "$conf"
+    else
+        echo -e "    ${DIM}Governor config left untouched. Please update manually if you experience SMU timeouts.${NC}"
+    fi
+}
+
+patch_governor_config() {
+    local conf="${1:-/etc/cyan-skillfish-governor-smu/config.toml}"
+    [ -f "$conf" ] || return 0
+
+    local backup="${conf}.bak.$(date +%Y%m%d%H%M%S)"
+    echo -e "    Creating backup at ${BOLD}$backup${NC}..."
+
+    local use_sudo=""
+    if [ ! -w "$conf" ] && command -v sudo >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
+        use_sudo="sudo"
+    fi
+
+    $use_sudo cp "$conf" "$backup"
+    $use_sudo sed -i -E 's/^[[:space:]]*set-method[[:space:]]*=[[:space:]]*"?smu"?/set-method = "kernel"/' "$conf"
+    $use_sudo sed -i -E 's/^[[:space:]]*fix-metrics[[:space:]]*=[[:space:]]*true/fix-metrics = false/' "$conf"
+    $use_sudo sed -i -E 's/^[[:space:]]*fix-freq[[:space:]]*=[[:space:]]*true/fix-freq = false/' "$conf"
+    if ! cat /sys/bus/pci/devices/0000:01:00.0/hwmon/hwmon1/temp1_input >/dev/null 2>&1; then
+        $use_sudo sed -i -E 's/^[[:space:]]*temp-read[[:space:]]*=[[:space:]]*"?sysfs"?/temp-read = "drm"/' "$conf"
+    fi
+    if [ "$conf" = "/etc/cyan-skillfish-governor-smu/config.toml" ] && systemctl is-active --quiet cyan-skillfish-governor-smu.service 2>/dev/null; then
+        echo -e "    Restarting cyan-skillfish-governor-smu.service..."
+        $use_sudo systemctl restart cyan-skillfish-governor-smu.service || true
+    fi
+    echo -e "    ${GREEN}✓ Successfully updated $conf to safe kernel DPM mode!${NC}"
+}
+
 parse_install_args() {
     DASHBOARD_FLAG=""
     MEMORY_TEMP_FLAG=auto
     MEMORY_MODE_FLAG=detect
     COMPONENTS_FLAG=""
     DRY_RUN_FLAG=0
+    FIX_GOVERNOR_FLAG=0
 
     for arg in "$@"; do
         case "$arg" in
@@ -33,6 +162,9 @@ parse_install_args() {
                 ;;
             --components=*)
                 COMPONENTS_FLAG="${arg#--components=}"
+                ;;
+            --fix-governor)
+                FIX_GOVERNOR_FLAG=1
                 ;;
             --dry-run)
                 DRY_RUN_FLAG=1

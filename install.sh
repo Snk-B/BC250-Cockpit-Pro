@@ -43,6 +43,10 @@ MEMORY_KERNEL="$(kernel_module_state bc250_memory)"
 MEMORY_KERNEL_OWNS=0
 if kernel_memory_driver_active; then MEMORY_KERNEL_OWNS=1; fi
 
+echo -e "${YELLOW}[PREFLIGHT]${NC} Auditing SMU and GPU Governor configuration..."
+audit_governor_config
+echo
+
 echo -e "${YELLOW}[STEP 1/7]${NC} Choosing sensor sources (VRM and GDDR6)..."
 
 echo "  VRM (CPU/GPU rails):"

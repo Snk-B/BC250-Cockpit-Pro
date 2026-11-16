@@ -223,4 +223,28 @@ if command -v g++ >/dev/null 2>&1; then
     fi
 fi
 
+
+# Governor configuration safety audit tests
+GOV_TMPDIR="$(mktemp -d)"
+cat << 'EOF' > "$GOV_TMPDIR/clean.toml"
+[gpu]
+set-method = "kernel"
+[gpu-usage]
+fix-metrics = false
+EOF
+
+cat << 'EOF' > "$GOV_TMPDIR/conflict.toml"
+[gpu]
+set-method = "smu"
+[gpu-usage]
+fix-metrics = true
+EOF
+
+assert_equals "0" "$(check_governor_smu_config "$GOV_TMPDIR/clean.toml"; echo $?)" "clean governor config should pass"
+assert_equals "1" "$(check_governor_smu_config "$GOV_TMPDIR/conflict.toml"; echo $?)" "conflicting governor config should fail"
+
+patch_governor_config "$GOV_TMPDIR/conflict.toml" >/dev/null 2>&1
+assert_equals "0" "$(check_governor_smu_config "$GOV_TMPDIR/conflict.toml"; echo $?)" "patched governor config should pass"
+rm -rf "$GOV_TMPDIR"
+
 echo "install-lib tests passed"
